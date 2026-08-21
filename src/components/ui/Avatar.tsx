@@ -16,7 +16,7 @@ function initialsOf(name: string): string {
 }
 
 /** Deterministic hue from a stable string id so a user always gets the same color. */
-function hueOf(id: string): number {
+export function hueOf(id: string): number {
   let h = 0;
   for (let i = 0; i < id.length; i++) {
     h = (h * 31 + id.charCodeAt(i)) | 0;

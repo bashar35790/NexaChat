@@ -75,6 +75,15 @@ export interface Message {
   createdAt: string;
 }
 
+/**
+ * A message as held in client caches: server entity plus optional LOCAL send
+ * state used by optimistic sending. `status` is never present on data that
+ * came straight from the API.
+ */
+export interface ClientMessage extends Message {
+  status?: "pending" | "failed";
+}
+
 /** GET /api/conversations/{id}/messages envelope (newest-first pages). */
 export interface MessagePage {
   messages: Message[];
