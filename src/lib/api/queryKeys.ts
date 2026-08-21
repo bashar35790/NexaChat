@@ -5,6 +5,7 @@
  * The pagination cursor lives in useInfiniteQuery's pageParam, not the key.
  */
 export const queryKeys = {
+  auth: () => ["auth", "me"] as const,
   conversations: () => ["conversations"] as const,
   messages: (conversationId: string) => ["messages", conversationId] as const,
   users: (q: string) => ["users", q] as const,
