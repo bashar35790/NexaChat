@@ -1,6 +1,5 @@
 "use client";
 
-import { Fragment } from "react";
 import { cn } from "@/lib/utils/cn";
 import { formatTime } from "@/lib/utils/date";
 import { hueOf } from "@/components/ui/Avatar";
@@ -10,23 +9,6 @@ import type { ClientMessage, Conversation } from "@/types/api";
 import type { MessageRun as MessageRunModel } from "./grouping";
 import { MessageBubble } from "./MessageBubble";
 
-/** Marker line above the first message that arrived while the user was away. */
-function UnreadDivider() {
-  return (
-    <div
-      role="separator"
-      aria-label="New messages below"
-      className="my-1.5 flex w-full items-center gap-2"
-    >
-      <span className="h-px min-w-6 flex-1 bg-primary/50" />
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-        New
-      </span>
-      <span className="h-px min-w-6 flex-1 bg-primary/50" />
-    </div>
-  );
-}
-
 /**
  * One consecutive-sender run: avatar (theirs) and colored sender name
  * (groups) render once, followed by that sender's stacked bubbles.
@@ -34,13 +16,10 @@ function UnreadDivider() {
 export function MessageRun({
   run,
   conversation,
-  firstUnreadId,
   onRetry,
 }: {
   run: MessageRunModel;
   conversation: Conversation;
-  /** First message that arrived while the user was scrolled away. */
-  firstUnreadId?: string | null;
   /** Retry affordance for failed sends (passed to matching bubbles). */
   onRetry?: (message: ClientMessage) => void;
 }) {
@@ -85,19 +64,17 @@ export function MessageRun({
         ) : null}
 
         {run.messages.map((message, index) => (
-          <Fragment key={message._id}>
-            {message._id === firstUnreadId ? <UnreadDivider /> : null}
-            <MessageBubble
-              message={message}
-              mine={mine}
-              last={index === run.messages.length - 1}
-              onRetry={
-                message.status === "failed" && onRetry
-                  ? () => onRetry(message)
-                  : undefined
-              }
-            />
-          </Fragment>
+          <MessageBubble
+            key={message._id}
+            message={message}
+            mine={mine}
+            last={index === run.messages.length - 1}
+            onRetry={
+              message.status === "failed" && onRetry
+                ? () => onRetry(message)
+                : undefined
+            }
+          />
         ))}
 
         {(() => {
