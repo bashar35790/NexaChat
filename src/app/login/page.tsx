@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { MessageCircle, Search, Users, Zap } from "lucide-react";
 import { LoginCard } from "@/components/auth/LoginCard";
 import { RedirectIfAuthed } from "@/components/auth/RedirectIfAuthed";
@@ -32,12 +33,16 @@ export default function LoginPage() {
           style={{ animationDelay: "-12s" }}
         />
 
-        <div className="relative z-10 flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight text-fg">
+        <Link
+          href="/"
+          className="relative z-10 flex w-fit items-center gap-2.5 font-display text-lg font-semibold tracking-tight text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+          title="Back to home page"
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-violet shadow-glow">
             <MessageCircle className="h-5 w-5 text-white" />
           </span>
           NexaChat
-        </div>
+        </Link>
 
         <div className="relative z-10 max-w-lg">
           <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-fg xl:text-6xl">

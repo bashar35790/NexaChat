@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { MessageCircle, Search, Users } from "lucide-react";
 import { ProfileRow } from "./ProfileRow";
 import { ConversationList } from "./ConversationList";
@@ -35,14 +36,18 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-line px-5">
+      <Link
+        href="/"
+        className="flex h-16 shrink-0 items-center gap-2.5 border-b border-line px-5 transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+        title="Back to home page"
+      >
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-violet">
           <MessageCircle className="size-4 text-white" aria-hidden="true" />
         </span>
-        <span className="font-display text-base font-semibold tracking-tight">
+        <span className="font-display text-base font-semibold tracking-tight text-white">
           NexaChat
         </span>
-      </div>
+      </Link>
 
       <ProfileRow />
 
