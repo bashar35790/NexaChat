@@ -29,9 +29,13 @@ export function MessageBubble({
   return (
     <div
       className={cn(
-        "max-w-[min(76%,34rem)] min-w-[4rem] whitespace-pre-wrap break-words",
-        "rounded-2xl px-4 py-3",
-        "text-[0.9375rem] font-normal leading-[1.65] tracking-normal",
+        // Sizing: parent column is already capped at 78% of chat width
+        "w-fit min-w-[6rem]",
+        // Shape & spacing
+        "rounded-2xl px-4 py-2.5",
+        // Typography
+        "text-[15px] font-normal leading-[1.65] tracking-wide",
+        "whitespace-pre-wrap break-words",
         mine
           ? "bg-gradient-to-br from-primary to-violet text-white shadow-glow"
           : "bg-raised text-fg",
@@ -41,8 +45,9 @@ export function MessageBubble({
             ? "ring-1 ring-white/15"
             : "ring-1 ring-line",
         pending && "opacity-70",
-        last && (mine ? "rounded-br-[6px]" : "rounded-bl-[6px]"),
+        last && (mine ? "rounded-br-sm" : "rounded-bl-sm"),
       )}
+      style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
     >
       {renderText(message.text)}
 
@@ -71,3 +76,4 @@ export function MessageBubble({
     </div>
   );
 }
+

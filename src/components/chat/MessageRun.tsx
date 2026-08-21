@@ -35,7 +35,7 @@ export function MessageRun({
   return (
     <div
       className={cn(
-        "flex items-end gap-2.5",
+        "flex w-full items-end gap-2.5",
         mine ? "justify-end" : "justify-start",
       )}
     >
@@ -48,9 +48,10 @@ export function MessageRun({
         />
       ) : null}
 
+      {/* Inner column: max-w is 78% of the full chat row width */}
       <div
         className={cn(
-          "flex min-w-0 flex-col gap-1.5",
+          "flex max-w-[78%] flex-col gap-1.5",
           mine ? "items-end" : "items-start",
         )}
       >
