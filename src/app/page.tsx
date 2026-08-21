@@ -2,6 +2,7 @@ import { Nav } from "@/components/landing/Nav";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Faq } from "@/components/landing/Faq";
+import { Testimonials } from "@/components/landing/Testimonials";
 import { TechStrip } from "@/components/landing/TechStrip";
 import { CtaBand, Footer } from "@/components/landing/CtaBand";
 
@@ -19,6 +20,7 @@ export default function LandingPage() {
         <Hero />
         <Features />
         <Faq />
+        <Testimonials />
         <TechStrip />
         <CtaBand />
       </main>
