@@ -1,4 +1,4 @@
-import type { ErrorCode, ErrorEnvelope, ValidationDetail } from "@/types/api";
+import type { ErrorCode, ValidationDetail } from "@/types/api";
 import { isSessionDeadCode } from "@/types/api";
 
 /** REST base — includes the /api prefix (health/socket live at host root instead). */
@@ -130,11 +130,32 @@ async function parseBody(response: Response): Promise<unknown> {
 }
 
 async function toApiError(response: Response, data: unknown): Promise<ApiError> {
-  const envelope = data as Partial<ErrorEnvelope> | null;
+  const envelope = data as { error?: unknown } | null;
   const error = envelope?.error;
-  if (error?.code && error.message) {
-    return new ApiError(error.message, response.status, error.code, error.details);
+
+  // Shape A — structured envelope {error: {code, message, details?}}.
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    "message" in error &&
+    typeof (error as { code: unknown }).code === "string" &&
+    typeof (error as { message: unknown }).message === "string"
+  ) {
+    const shaped = error as {
+      code: ErrorCode | ClientErrorCode;
+      message: string;
+      details?: ValidationDetail[];
+    };
+    return new ApiError(shaped.message, response.status, shaped.code, shaped.details);
   }
+
+  // Shape B — bare-string {error: "..."} (observed on group-permission 403s);
+  // the server text is the clearest thing to surface, so keep it verbatim.
+  if (typeof error === "string" && error) {
+    return new ApiError(error, response.status, "SERVER_ERROR");
+  }
+
   return new ApiError(
     (response.statusText || `Request failed with ${response.status}`).trim(),
     response.status,
