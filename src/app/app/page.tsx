@@ -1,18 +1,22 @@
+"use client";
+
+import { MessageCircle } from "lucide-react";
 import { RequireAuth } from "@/components/auth/RequireAuth";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { AppShell } from "@/components/layout/AppShell";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Sidebar } from "@/components/sidebar/Sidebar";
 
 export default function AppPage() {
   return (
     <RequireAuth>
-      <main className="flex min-h-dvh flex-col items-center justify-center gap-6">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Workspace
-        </h1>
-        <p className="text-sm text-muted">
-          The chat shell lands in Phase 5.
-        </p>
-        <LogoutButton />
-      </main>
+      <AppShell sidebar={<Sidebar />}>
+        <EmptyState
+          className="h-full"
+          icon={<MessageCircle />}
+          title="Select a conversation"
+          description="Pick a chat from the list, or search for someone to start a new conversation."
+        />
+      </AppShell>
     </RequireAuth>
   );
 }
