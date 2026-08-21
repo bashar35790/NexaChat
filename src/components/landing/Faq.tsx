@@ -56,7 +56,7 @@ export function Faq() {
           <h2 className="mt-4 font-display font-bold tracking-tight text-white [font-size:clamp(2rem,3vw+1rem,3.25rem)] [text-wrap:balance]">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-lg text-muted [text-wrap:pretty]">
+          <p className="mt-4 text-lg text-white/80 [text-wrap:pretty]">
             Everything you need to know about NexaChat&apos;s real-time messaging, group management, and security.
           </p>
         </Reveal>
@@ -77,7 +77,7 @@ export function Faq() {
                       {faq.question}
                     </span>
                     <span
-                      className={`flex size-8 shrink-0 items-center justify-center rounded-xl bg-raised text-muted transition-transform duration-300 ${
+                      className={`flex size-8 shrink-0 items-center justify-center rounded-xl bg-raised text-white transition-transform duration-300 ${
                         isOpen ? "rotate-180 bg-primary/20 text-accent" : ""
                       }`}
                     >
@@ -93,7 +93,7 @@ export function Faq() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                       >
-                        <div className="border-t border-line/50 px-6 pb-6 pt-4 text-sm leading-relaxed text-muted sm:text-base">
+                        <div className="border-t border-line/50 px-6 pb-6 pt-4 text-sm leading-relaxed text-white sm:text-base font-medium">
                           {faq.answer}
                         </div>
                       </motion.div>
