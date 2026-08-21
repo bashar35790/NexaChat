@@ -1,21 +1,17 @@
 "use client";
 
-import {
-  useMutation,
-  useQueryClient,
-  type InfiniteData,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { sendMessage } from "@/lib/api/messages";
 import { queryKeys } from "@/lib/api/queryKeys";
+import {
+  bumpConversationPreview,
+  removeMessage,
+  replaceEverywhere,
+  upsertMessage,
+  type MessagesCache,
+} from "@/lib/api/messageCache";
 import { useAuthStore } from "@/stores/authStore";
-import type {
-  ClientMessage,
-  Conversation,
-  Message,
-  MessagePage,
-} from "@/types/api";
-
-type MessagesCache = InfiniteData<MessagePage>;
+import type { ClientMessage, Conversation } from "@/types/api";
 
 export interface SendPayload {
   text: string;
@@ -25,74 +21,6 @@ export interface SendPayload {
 
 function makeTempId(): string {
   return `tmp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function mapAllPages(
-  cache: MessagesCache,
-  fn: (messages: ClientMessage[]) => ClientMessage[],
-): MessagesCache {
-  return {
-    ...cache,
-    pages: cache.pages.map((page) => ({ ...page, messages: fn(page.messages) })),
-  };
-}
-
-function removeMessage(cache: MessagesCache, id: string): MessagesCache {
-  return mapAllPages(
-    cache,
-    (messages) => messages.filter((m) => m._id !== id),
-  );
-}
-
-/**
- * New sends are the chronologically newest entries → head of the FIRST page
- * (pages are newest-first), inserted by descending timestamp so clock skew
- * can't corrupt order (ordering guard).
- */
-function prependToFirstPage(cache: MessagesCache, temp: ClientMessage): MessagesCache {
-  const [firstPage, ...rest] = cache.pages;
-  if (!firstPage) {
-    return { pages: [{ messages: [temp], hasMore: false }], pageParams: cache.pageParams };
-  }
-  const messages = [...firstPage.messages];
-  const index = messages.findIndex((m) => m.createdAt <= temp.createdAt);
-  if (index === -1) messages.push(temp);
-  else messages.splice(index, 0, temp);
-  return { ...cache, pages: [{ ...firstPage, messages }, ...rest] };
-}
-
-function replaceEverywhere(
-  cache: MessagesCache,
-  id: string,
-  transform: (message: ClientMessage) => ClientMessage,
-): MessagesCache {
-  return mapAllPages(
-    cache,
-    (messages) => messages.map((m) => (m._id === id ? transform(m) : m)),
-  );
-}
-
-/** Moves the conversation to the top of the list with a fresh preview. */
-function bumpConversationPreview(
-  conversations: Conversation[],
-  conversationId: string,
-  message: Message,
-): Conversation[] {
-  return conversations
-    .map((c) =>
-      c._id === conversationId
-        ? {
-            ...c,
-            lastMessage: {
-              text: message.text,
-              sender: message.sender,
-              createdAt: message.createdAt,
-            },
-            updatedAt: message.createdAt,
-          }
-        : c,
-    )
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 /**
@@ -129,12 +57,12 @@ export function useSendMessage(conversationId: string) {
           ? removeMessage(old, payload.failedTempId)
           : old;
         if (!base) {
-          return {
-            pages: [{ messages: [temp], hasMore: false }],
-            pageParams: [undefined],
-          };
+          return upsertMessage(
+            { pages: [], pageParams: [] },
+            temp,
+          );
         }
-        return prependToFirstPage(base, temp);
+        return upsertMessage(base, temp);
       });
 
       return { tempId: temp._id };
