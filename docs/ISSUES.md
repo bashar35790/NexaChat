@@ -1,0 +1,31 @@
+# Known API Issues & Workarounds
+
+> Every item below was **reproduced live** against `https://frontend-task-chatapp.onrender.com`
+> on 2026-08-21. Raw transcripts: [`probing-notes.md`](./probing-notes.md). This log feeds the
+> "Issues You Ran Into" section of the README.
+
+| # | Issue | Impact | Workaround implemented |
+|---|---|---|---|
+| 1 | Health check lives at host root (`/health`), not under `/api`; `/api/health` returns 404 `NOT_FOUND` | Minor | Documented; client never calls it |
+| 2 | Missing token → **HTTP 400** `NO_TOKEN` instead of 401 | Auth handling can't rely on 401 alone | Client treats `{400 NO_TOKEN, 401 INVALID_TOKEN}` as one "session dead" union → single-flight force-logout |
+| 3 | **No phone-format validation** — `"not-a-phone"` registered successfully as a real user | Junk accounts possible; search by number unreliable | Login form enforces E.164-ish format client-side before submit |
+| 4 | Duplicate-phone login **silently renames** the existing account (same `_id`, new name) | A typo'd phone hijacks someone's identity; user may not expect rename | Login screen copy states that an existing number logs in and updates its display name |
+| 5 | User search is **case-sensitive and name-prefix-only**: `bob` misses "Bob Marley"; substring/suffix never matches | Search feels broken to users typing naturally | UI hint ("search matches the start of a name"); no case coercion possible server-side |
+| 6 | Phone search is effectively **broken**: digits-only can't match (phones stored with leading `+`, match is anchored); a literal `+` (or any regex metachar) crashes the server → HTTP 500 leaking a raw Mongo error (`code: 51091`) | Typing a number crashes search | Query sanitizer strips regex metacharacters before sending; any 5xx renders as graceful empty/retry state, never raw error text |
+| 7 | Empty `q` returns the **entire unpaginated user directory** (50+ users observed) | Performance/noise; unintended data exposure | Client enforces min query length (2 chars) before calling |
+| 8 | **Empty and whitespace-only messages are accepted and stored** (`text:""`, `"   "` both → 200) | Assignment requires empty messages be unsendable — server won't help | Composer blocks send on trim-empty (disabled button + Enter no-op); renderer defensively collapses whitespace-only messages if encountered in history |
+| 9 | Send to nonexistent conversation → **HTTP 200 with body `null`** (silent failure) | Optimistic UI would hang forever thinking the send succeeded | Mutation detects null/absent entity → marks optimistic bubble failed with retry chip |
+| 10 | Group add-member with unknown userId → **HTTP 500** `SERVER_ERROR` (raw Mongo crash) instead of clean validation | Ugly failure path | Add-member flow only offers ids sourced from `/users/search` results, so unknown ids can't be submitted; 5xx handled as toast + retry |
+| 11 | **WS payloads differ from REST**: key `id` (not `_id`), `createdAt` as epoch-millis number (not ISO string) | Naive cache merge would corrupt ids/timestamps | Single normalizer unifies WS events into the REST entity shape before entering TanStack Query caches |
+| 12 | Protocol inconsistencies: inclusive `before` cursor re-returns the boundary message; `limit=0` falls back to default 20; unknown `before` id silently ignored; envelopes differ per endpoint (`{data}` vs `{messages}` vs bare entity); status codes inconsistent (`201` group create vs `200` DM create) | Pagination bugs (duplicated messages), fragile parsing | Cursor fetch passes last-known `_id` and prepends with id-based dedupe; explicit per-endpoint response types encode each envelope; page size pinned client-side (never sends `limit=0`) |
+
+## Positives worth noting
+
+The API is not all quirks — several things are genuinely well-designed:
+
+- Consistent error envelope everywhere: `{error:{message, code}}`
+- Structured field-level validation errors (`details[{path,message}]`) map cleanly onto form UX
+- Uniform `403 FORBIDDEN` with human-readable messages for every permission violation
+- Full refreshed entities returned from every mutation — ideal for direct cache patches
+- Graceful sole-admin leave: adminship auto-transfers instead of orphaning the group
+- Clean socket-side errors via acks (`{ok:false,error}`) even where REST fails silently
