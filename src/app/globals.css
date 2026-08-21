@@ -115,6 +115,29 @@ body {
   outline-offset: 2px;
 }
 
+/* ---------- aurora orbs (login hero / landing) ---------- */
+
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(48px, -36px, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-28px, 24px, 0) scale(0.94);
+  }
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  animation: aurora-drift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* ---------- accessibility ---------- */
 
 @media (prefers-reduced-motion: reduce) {
