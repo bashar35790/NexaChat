@@ -17,6 +17,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nexa-chat-delta.vercel.app"),
   title: {
     default: "NexaChat — Conversations at the speed of thought",
     template: "%s · NexaChat",
@@ -30,6 +31,13 @@ export const metadata: Metadata = {
       "Real-time one-to-one and group messaging with instant delivery, user search, and groups.",
     siteName: "NexaChat",
     type: "website",
+    url: "https://nexa-chat-delta.vercel.app",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NexaChat",
+    description:
+      "Real-time one-to-one and group messaging with instant delivery, user search, and groups.",
   },
 };
 

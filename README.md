@@ -10,8 +10,8 @@ Built as a take-home engineering assignment against a live, partly-quirky REST +
 
 | | |
 |---|---|
-| **Landing page** | _URL added after deploy (T11.3)_ |
-| **App** | `/app` on the same deployment — sign in with any phone number in `+1555…` format |
+| **Landing page** | [https://nexa-chat-delta.vercel.app](https://nexa-chat-delta.vercel.app) |
+| **App** | [https://nexa-chat-delta.vercel.app/app](https://nexa-chat-delta.vercel.app/app) — sign in with any phone number in `+1555…` format |
 
 > Demo accounts: the login endpoint auto-registers new numbers, so you can create throwaway
 > accounts instantly. Open two browser profiles to watch messages sync in real time.
