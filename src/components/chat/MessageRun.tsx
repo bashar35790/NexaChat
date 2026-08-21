@@ -5,7 +5,7 @@ import { formatTime } from "@/lib/utils/date";
 import { hueOf } from "@/components/ui/Avatar";
 import { Avatar } from "@/components/ui/Avatar";
 import { useAuthStore } from "@/stores/authStore";
-import type { Conversation } from "@/types/api";
+import type { ClientMessage, Conversation } from "@/types/api";
 import type { MessageRun as MessageRunModel } from "./grouping";
 import { MessageBubble } from "./MessageBubble";
 
@@ -16,9 +16,12 @@ import { MessageBubble } from "./MessageBubble";
 export function MessageRun({
   run,
   conversation,
+  onRetry,
 }: {
   run: MessageRunModel;
   conversation: Conversation;
+  /** Retry affordance for failed sends (passed to matching bubbles). */
+  onRetry?: (message: ClientMessage) => void;
 }) {
   const meId = useAuthStore((s) => s.user?._id);
   const mine = run.sender === meId;
@@ -66,6 +69,11 @@ export function MessageRun({
             message={message}
             mine={mine}
             last={index === run.messages.length - 1}
+            onRetry={
+              message.status === "failed" && onRetry
+                ? () => onRetry(message)
+                : undefined
+            }
           />
         ))}
 

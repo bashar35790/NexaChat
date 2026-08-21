@@ -1,5 +1,6 @@
 "use client";
 
+import { AlertCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { ClientMessage } from "@/types/api";
 
@@ -13,12 +14,18 @@ export function MessageBubble({
   message,
   mine,
   last,
+  onRetry,
 }: {
   message: ClientMessage;
   mine: boolean;
   /** Last bubble in a run — tightens the corner nearest the avatar column. */
   last: boolean;
+  /** Present only on failed sends — renders the retry affordance. */
+  onRetry?: () => void;
 }) {
+  const pending = message.status === "pending";
+  const failed = message.status === "failed";
+
   return (
     <div
       className={cn(
@@ -26,10 +33,35 @@ export function MessageBubble({
         mine
           ? "rounded-2xl bg-gradient-to-br from-primary to-violet text-white shadow-glow"
           : "bg-raised text-fg ring-1 ring-line",
+        failed && "ring-1 ring-danger/60",
+        pending && "opacity-70",
         last && (mine ? "rounded-br-md" : "rounded-bl-md"),
       )}
     >
       {renderText(message.text)}
+
+      {pending ? (
+        <Clock
+          className="ml-1 inline size-3 align-baseline opacity-80"
+          aria-label="Sending"
+        />
+      ) : null}
+
+      {failed ? (
+        <span className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-danger">
+          <AlertCircle className="size-3 shrink-0" aria-hidden="true" />
+          Failed to send
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="rounded-full px-2 py-0.5 underline underline-offset-2 transition-colors hover:bg-danger/15 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+            >
+              Retry
+            </button>
+          ) : null}
+        </span>
+      ) : null}
     </div>
   );
 }

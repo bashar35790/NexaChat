@@ -13,9 +13,12 @@ import { DaySeparator } from "./DaySeparator";
 export function MessageList({
   messages,
   conversation,
+  onRetry,
 }: {
   messages: ClientMessage[];
   conversation: Conversation;
+  /** Retry affordance for failed sends (passed to matching bubbles). */
+  onRetry?: (message: ClientMessage) => void;
 }) {
   const days = groupMessages(messages);
 
@@ -31,6 +34,7 @@ export function MessageList({
               key={`${day.key}-${index}-${run.sender}`}
               run={run}
               conversation={conversation}
+              onRetry={onRetry}
             />
           ))}
         </div>
