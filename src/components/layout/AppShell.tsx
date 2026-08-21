@@ -19,7 +19,14 @@ export function AppShell({
   children: React.ReactNode;
 }) {
   const mobilePane = useUiStore((s) => s.mobilePane);
+  const activeConversationId = useUiStore((s) => s.activeConversationId);
+  const [prevActiveId, setPrevActiveId] = useState(activeConversationId);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  if (activeConversationId !== prevActiveId) {
+    setPrevActiveId(activeConversationId);
+    if (drawerOpen) setDrawerOpen(false);
+  }
 
   return (
     <div className="flex h-dvh overflow-hidden bg-base">
