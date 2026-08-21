@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MessageCircle, Search, Users, Zap } from "lucide-react";
 import { LoginCard } from "@/components/auth/LoginCard";
+import { RedirectIfAuthed } from "@/components/auth/RedirectIfAuthed";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -15,6 +16,7 @@ const HIGHLIGHTS = [
 export default function LoginPage() {
   return (
     <main className="relative flex min-h-dvh flex-col overflow-hidden lg:grid lg:grid-cols-[1.1fr_1fr]">
+      <RedirectIfAuthed />
       {/* ---- hero side ---- */}
       <section
         aria-hidden="true"

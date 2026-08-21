@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getMe } from "@/lib/api/auth";
@@ -26,15 +26,18 @@ export function useAuthSession(): SessionStatus {
 
   // Zustand persist rehydrates async from localStorage; gate validation on it
   // so a valid session is never mistaken for a missing one mid-hydration.
-  const [hydrated, setHydrated] = useState(
-    () => useAuthStore.persist.hasHydrated(),
+  // useSyncExternalStore keeps SSR (server snapshot: false → "restoring")
+  // mismatch-free; on the server `window` is undefined, so zustand's persist
+  // never even attaches its api — the ?? true fallback covers that shape.
+  const hydrated = useSyncExternalStore(
+    (onStoreChange) => {
+      const persistApi = useAuthStore.persist;
+      if (!persistApi) return () => {};
+      return persistApi.onFinishHydration(onStoreChange);
+    },
+    () => useAuthStore.persist?.hasHydrated() ?? true,
+    () => false,
   );
-  useEffect(() => {
-    const unsub = useAuthStore.persist.onFinishHydration(() =>
-      setHydrated(true),
-    );
-    return unsub;
-  }, []);
 
   const meQuery = useQuery({
     queryKey: queryKeys.auth(),
