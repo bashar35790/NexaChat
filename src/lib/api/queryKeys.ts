@@ -7,6 +7,8 @@
 export const queryKeys = {
   auth: () => ["auth", "me"] as const,
   conversations: () => ["conversations"] as const,
+  /** Prefix key for bulk invalidation across every conversation's cache. */
+  messagesRoot: () => ["messages"] as const,
   messages: (conversationId: string) => ["messages", conversationId] as const,
   users: (q: string) => ["users", q] as const,
 };

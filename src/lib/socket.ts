@@ -23,6 +23,9 @@ let currentToken: string | null = null;
 let status: ConnectionStatus = "idle";
 const statusListeners = new Set<(next: ConnectionStatus) => void>();
 
+/** True once the CURRENT connection identity has completed a handshake. */
+let everConnected = false;
+
 function setStatus(next: ConnectionStatus): void {
   if (status === next) return;
   status = next;
@@ -40,8 +43,15 @@ export function getConnectionStatus(): ConnectionStatus {
   return status;
 }
 
+export function hasConnectedOnce(): boolean {
+  return everConnected;
+}
+
 function wireLifecycle(socket: Socket): Socket {
-  socket.on("connect", () => setStatus("connected"));
+  socket.on("connect", () => {
+    everConnected = true;
+    setStatus("connected");
+  });
   socket.on("disconnect", () => setStatus("disconnected"));
   // Handshake failures (bad/expired token) and network drops both land here;
   // engine.io keeps retrying until teardown or success.
@@ -56,6 +66,7 @@ export async function getSocket(token: string): Promise<Socket> {
   if (socketPromise) await disconnectSocket();
 
   currentToken = token;
+  everConnected = false;
   setStatus("connecting");
   socketPromise = import("socket.io-client").then(({ io }) =>
     wireLifecycle(
@@ -74,6 +85,7 @@ export async function disconnectSocket(): Promise<void> {
   const pending = socketPromise;
   socketPromise = null;
   currentToken = null;
+  everConnected = false;
 
   if (!pending) {
     setStatus("idle");

@@ -5,6 +5,7 @@ import type { Socket } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket, disconnectSocket } from "@/lib/socket";
 import { applyIncomingMessage } from "@/lib/realtime/incoming";
+import { queryKeys } from "@/lib/api/queryKeys";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { useAuthStore } from "@/stores/authStore";
 import type { RawSocketMessage } from "@/types/api";
@@ -29,11 +30,32 @@ export function RealtimeBridge() {
 
     let active = true;
     let socket: Socket | null = null;
+    /** Set when the transport drops; the next `connect` heals the gap. */
+    let dropped = false;
 
     void getSocket(token)
       .then((instance) => {
         if (!active) return;
         socket = instance;
+
+        const onConnect = () => {
+          if (!dropped) return;
+          dropped = false;
+          // Gap healing: anything missed while offline is re-fetched. Prefix
+          // keys hit every conversation's messages cache + the list itself.
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.messagesRoot(),
+          });
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.conversations(),
+          });
+        };
+        const onDisconnect = () => {
+          dropped = true;
+        };
+
+        socket.on("connect", onConnect);
+        socket.on("disconnect", onDisconnect);
         socket.on("message:new", (raw: RawSocketMessage) => {
           // Malformed/garbage events must never poison caches.
           if (
