@@ -5,7 +5,12 @@ import {
   upsertMessage,
   type MessagesCache,
 } from "@/lib/api/messageCache";
-import { upsertConversation } from "@/lib/api/conversationCache";
+import {
+  removeConversation,
+  upsertConversation,
+} from "@/lib/api/conversationCache";
+import { useAuthStore } from "@/stores/authStore";
+import { useUiStore } from "@/stores/uiStore";
 import type {
   Conversation,
   ConversationUpdatedPayload,
@@ -68,16 +73,28 @@ export function applyIncomingMessage(
     (old) => (old ? upsertMessage(old, message) : old),
   );
 
-  const senderName = resolveSenderName(
-    queryClient.getQueryData<Conversation[]>(queryKeys.conversations()),
-    message.sender,
+  const conversations = queryClient.getQueryData<Conversation[]>(
+    queryKeys.conversations(),
+  );
+  const conversationExists = conversations?.some(
+    (c) => c._id === message.conversation,
   );
 
-  queryClient.setQueryData<Conversation[]>(
-    queryKeys.conversations(),
-    (old) =>
-      old ? bumpConversationPreview(old, message.conversation, message) : old,
-  );
+  if (!conversationExists) {
+    // If the conversation is not yet in our list (e.g. newly started by another user),
+    // invalidate conversations so it appears immediately with full enriched participant info.
+    void queryClient.invalidateQueries({
+      queryKey: queryKeys.conversations(),
+    });
+  } else {
+    queryClient.setQueryData<Conversation[]>(
+      queryKeys.conversations(),
+      (old) =>
+        old ? bumpConversationPreview(old, message.conversation, message) : old,
+    );
+  }
+
+  const senderName = resolveSenderName(conversations, message.sender);
 
   const body =
     message.text.length > ANNOUNCE_TEXT_LIMIT
@@ -111,6 +128,26 @@ export function applyConversationUpdate(
 
   if (existing.type !== "group") return;
 
+  const meId = useAuthStore.getState().user?._id;
+  if (
+    payload.participants &&
+    meId &&
+    !payload.participants.some((p) => p._id === meId)
+  ) {
+    // Current user was removed from the group by an admin
+    queryClient.setQueryData<Conversation[]>(
+      queryKeys.conversations(),
+      (old) => (old ? removeConversation(old, payload._id) : old),
+    );
+    queryClient.removeQueries({
+      queryKey: queryKeys.messages(payload._id),
+    });
+    if (useUiStore.getState().activeConversationId === payload._id) {
+      useUiStore.getState().setActiveConversation(null);
+    }
+    return;
+  }
+
   queryClient.setQueryData<Conversation[]>(
     queryKeys.conversations(),
     (old) =>
@@ -124,3 +161,4 @@ export function applyConversationUpdate(
         : old,
   );
 }
+
