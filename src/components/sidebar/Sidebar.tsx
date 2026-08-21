@@ -1,14 +1,15 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Search } from "lucide-react";
 import { ProfileRow } from "./ProfileRow";
 import { ConversationList } from "./ConversationList";
+import { UserSearchDialog } from "./UserSearchDialog";
+import { useUiStore } from "@/stores/uiStore";
 
-/**
- * Sidebar frame. Sections compose in as they are built:
- * search trigger (T5.4).
- */
 export function Sidebar() {
+  const searchOpen = useUiStore((s) => s.searchOpen);
+  const setSearchOpen = useUiStore((s) => s.setSearchOpen);
+
   return (
     <>
       <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-line px-5">
@@ -22,7 +23,25 @@ export function Sidebar() {
 
       <ProfileRow />
 
+      <div className="px-3 pb-2 pt-3">
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className="flex h-10 w-full items-center gap-2.5 rounded-xl bg-raised px-3.5 text-sm text-faint ring-1 ring-line transition-shadow hover:ring-line-strong focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+        >
+          <Search className="size-4 shrink-0" aria-hidden="true" />
+          Search people…
+        </button>
+      </div>
+
       <ConversationList />
+
+      {/* DM creation wired in T5.5; selection closes for now. */}
+      <UserSearchDialog
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelect={() => setSearchOpen(false)}
+      />
     </>
   );
 }

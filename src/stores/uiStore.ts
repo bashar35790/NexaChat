@@ -13,17 +13,22 @@ interface UIState {
   activeConversationId: string | null;
   /** Single-pane switcher for <768px viewports. */
   mobilePane: MobilePane;
+  /** User-search dialog visibility. */
+  searchOpen: boolean;
   setActiveConversation: (id: string | null) => void;
   /** Selects a conversation AND flips the mobile pane to the chat side. */
   openConversation: (id: string) => void;
   setMobilePane: (pane: MobilePane) => void;
+  setSearchOpen: (open: boolean) => void;
 }
 
 export const useUiStore = create<UIState>()((set) => ({
   activeConversationId: null,
   mobilePane: "list",
+  searchOpen: false,
   setActiveConversation: (id) => set({ activeConversationId: id }),
   openConversation: (id) =>
     set({ activeConversationId: id, mobilePane: "chat" }),
   setMobilePane: (pane) => set({ mobilePane: pane }),
+  setSearchOpen: (open) => set({ searchOpen: open }),
 }));
