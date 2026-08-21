@@ -4,11 +4,31 @@ import { MessageCircle, Search } from "lucide-react";
 import { ProfileRow } from "./ProfileRow";
 import { ConversationList } from "./ConversationList";
 import { UserSearchDialog } from "./UserSearchDialog";
+import { useStartDirectConversation } from "@/hooks/useStartDirectConversation";
 import { useUiStore } from "@/stores/uiStore";
+import { useToast } from "@/components/ui/Toast";
+import type { User } from "@/types/api";
 
 export function Sidebar() {
   const searchOpen = useUiStore((s) => s.searchOpen);
   const setSearchOpen = useUiStore((s) => s.setSearchOpen);
+  const openConversation = useUiStore((s) => s.openConversation);
+  const startDm = useStartDirectConversation();
+  const toast = useToast();
+
+  async function handleSelectUser(user: User) {
+    try {
+      const created = await startDm.mutateAsync(user);
+      setSearchOpen(false);
+      openConversation(created._id);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? `Couldn't start the conversation: ${error.message}`
+          : "Couldn't start the conversation.",
+      );
+    }
+  }
 
   return (
     <>
@@ -36,11 +56,10 @@ export function Sidebar() {
 
       <ConversationList />
 
-      {/* DM creation wired in T5.5; selection closes for now. */}
       <UserSearchDialog
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelect={() => setSearchOpen(false)}
+        onSelect={(user) => void handleSelectUser(user)}
       />
     </>
   );
