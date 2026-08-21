@@ -124,7 +124,7 @@ export function CreateGroupDialog({
               <Users className="mr-1 inline size-3.5 align-baseline" aria-hidden="true" />
               {enoughMembers
                 ? `${selected.length + 1} members total`
-                : `Add ${MIN_OTHERS - selected.length} more — groups need at least ${MIN_OTHERS + 1} members.`}
+                : `Add ${MIN_OTHERS - selected.length} more ,groups need at least ${MIN_OTHERS + 1} members.`}
             </p>
             <Button
               size="sm"

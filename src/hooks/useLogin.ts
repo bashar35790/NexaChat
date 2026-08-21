@@ -8,7 +8,7 @@ import { useAuthStore } from "@/stores/authStore";
 /**
  * Full login flow: POST /auth/login → persist {token, user} → enter /app.
  * Duplicate-phone semantics (probing T1.1): an existing number signs in and
- * its display name is silently updated server-side — the returned user entity
+ * its display name is silently updated server-side ,the returned user entity
  * (already renamed) is what lands in the store, keeping identity in sync.
  */
 export function useLogin() {

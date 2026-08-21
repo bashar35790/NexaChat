@@ -13,7 +13,7 @@ import { useAuthStore } from "@/stores/authStore";
 /**
  * Boots the API client's auth wiring exactly once per app load:
  * - token provider: every request reads the live session token;
- * - force-logout: invoked (single-flight, loop-safe — see client.ts) whenever
+ * - force-logout: invoked (single-flight, loop-safe ,see client.ts) whenever
  *   any request dies with {400 NO_TOKEN | 401 INVALID_TOKEN}.
  */
 export function AuthWiring() {

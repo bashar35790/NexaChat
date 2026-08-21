@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 /* ============================================================
-   NexaChat Design Tokens — "Premium Dark Aurora"
+   NexaChat Design Tokens ,"Premium Dark Aurora"
    Single source of truth. Exposed to Tailwind via @theme inline.
    ============================================================ */
 
 :root {
   /* --- surfaces --- */
-  --base: #0b0d12;            /* page background (ink) */
-  --surface: #12151c;         /* panels: sidebar, cards */
-  --raised: #171b24;          /* inputs, their bubbles */
-  --overlay: #1e2534;         /* modals, dropdowns, hovers */
+  --base: #0b0d12; /* page background (ink) */
+  --surface: #12151c; /* panels: sidebar, cards */
+  --raised: #171b24; /* inputs, their bubbles */
+  --overlay: #1e2534; /* modals, dropdowns, hovers */
 
   /* --- lines & text --- */
   --line: rgb(255 255 255 / 8%);
@@ -20,9 +20,9 @@
   --faint: #667085;
 
   /* --- brand --- */
-  --primary: #6366f1;         /* indigo */
+  --primary: #6366f1; /* indigo */
   --violet: #8b5cf6;
-  --accent: #22d3ee;          /* cyan */
+  --accent: #22d3ee; /* cyan */
   --primary-soft: rgb(99 102 241 / 16%);
   --gradient-brand: linear-gradient(135deg, var(--primary), var(--violet));
 
@@ -36,7 +36,8 @@
   --radius-panel: 1.25rem;
 
   /* --- elevation --- */
-  --shadow-panel: 0 12px 40px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 4%);
+  --shadow-panel:
+    0 12px 40px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 4%);
   --shadow-pop: 0 16px 48px rgb(0 0 0 / 55%);
   --glow-primary: 0 0 44px rgb(99 102 241 / 30%);
 
@@ -115,6 +116,12 @@ body {
   outline-offset: 2px;
 }
 
+/* Tailwind v4 preflight no longer sets pointer on buttons */
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
 /* ---------- aurora orbs (login hero / landing) ---------- */
 
 @keyframes aurora-drift {
@@ -136,6 +143,48 @@ body {
   filter: blur(90px);
   animation: aurora-drift 18s ease-in-out infinite;
   will-change: transform;
+}
+
+/* ---------- tech strip marquee ---------- */
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 44s linear infinite;
+}
+
+.marquee-track--reverse {
+  animation-direction: reverse;
+  animation-duration: 52s;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-mask {
+  overflow: hidden;
+  padding-block: 1rem;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
 }
 
 /* ---------- accessibility ---------- */

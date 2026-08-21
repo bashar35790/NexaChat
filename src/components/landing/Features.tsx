@@ -14,7 +14,7 @@ const FEATURES = [
   {
     icon: <Zap className="size-5" aria-hidden="true" />,
     title: "Real-time delivery",
-    body: "A live socket keeps every conversation in lockstep — messages land the moment they're sent, with reconnects that heal themselves.",
+    body: "A live socket keeps every conversation in lockstep ,messages land the moment they're sent, with reconnects that heal themselves.",
     vignette: <RealtimeVignette />,
   },
   {
@@ -26,7 +26,7 @@ const FEATURES = [
   {
     icon: <Search className="size-5" aria-hidden="true" />,
     title: "Instant search",
-    body: "Start typing a name and the directory answers as you go — pick a person and you're already talking.",
+    body: "Start typing a name and the directory answers as you go ,pick a person and you're already talking.",
     vignette: <SearchVignette />,
   },
 ] as const;
@@ -43,7 +43,7 @@ export function Features() {
             Everything a conversation needs.
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-muted text-wrap-pretty">
-            No setup ceremonies, no lost threads — just the mechanics of great
+            No setup ceremonies, no lost threads ,just the mechanics of great
             messaging, done properly with luxury engineering.
           </p>
         </Reveal>

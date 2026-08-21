@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import type { User } from "@/types/api";
 
 /**
- * AUTH SESSION ONLY — hard ownership rule (plan §3): this store holds the
+ * AUTH SESSION ONLY ,hard ownership rule (plan §3): this store holds the
  * JWT + identity pair and nothing else. All server data lives exclusively in
  * TanStack Query caches.
  */
@@ -16,7 +16,7 @@ interface AuthState {
   setSession: (session: { token: string; user: User }) => void;
   /** Patches identity fields only (e.g. server-side rename on re-login). */
   setUser: (user: User) => void;
-  /** Wipes the session — logout or force-logout on dead token. */
+  /** Wipes the session ,logout or force-logout on dead token. */
   clear: () => void;
 }
 

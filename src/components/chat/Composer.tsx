@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils/cn";
 /** ~6 rows at 24px line-height, then the textarea scrolls internally. */
 const MAX_HEIGHT_PX = 144;
 /**
- * Server accepts unbounded texts (probing: 10k chars stored) — this client
+ * Server accepts unbounded texts (probing: 10k chars stored) ,this client
  * cap keeps payloads sane and the composer usable.
  */
 const MAX_LENGTH = 4000;

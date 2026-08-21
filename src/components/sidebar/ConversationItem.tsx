@@ -6,7 +6,7 @@ import type { Conversation } from "@/types/api";
 import { Avatar } from "@/components/ui/Avatar";
 import { useUiStore } from "@/stores/uiStore";
 
-/** Whitespace-only texts are storable server-side (ISSUES.md #8) — collapse. */
+/** Whitespace-only texts are storable server-side (ISSUES.md #8) ,collapse. */
 function previewOf(conversation: Conversation): string | null {
   const text = conversation.lastMessage?.text?.trim();
   return text ? text : null;

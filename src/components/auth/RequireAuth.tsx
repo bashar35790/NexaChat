@@ -30,7 +30,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
     if (status === "unauthenticated") router.replace("/login");
   }, [status, router]);
 
-  // "restoring" also covers the dead-token redirect in flight — never flash
+  // "restoring" also covers the dead-token redirect in flight ,never flash
   // protected content for either case.
   if (status !== "authenticated") return <Splash />;
   return <>{children}</>;

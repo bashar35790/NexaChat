@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL("https://nexa-chat-delta.vercel.app"),
   title: {
-    default: "NexaChat — Conversations at the speed of thought",
+    default: "NexaChat ,Conversations at the speed of thought",
     template: "%s · NexaChat",
   },
   description:

@@ -61,13 +61,13 @@ export function upsertMessage(
   cache: MessagesCache,
   message: Message | ClientMessage,
 ): MessagesCache {
-  // Rule 1 — exact id match: already represented, nothing to do.
+  // Rule 1 ,exact id match: already represented, nothing to do.
   const exists = cache.pages.some((page) =>
     page.messages.some((m) => m._id === message._id),
   );
   if (exists) return cache;
 
-  // Rule 2 — content-window fallback: a just-sent optimistic bubble whose
+  // Rule 2 ,content-window fallback: a just-sent optimistic bubble whose
   // server confirmation arrived through another channel (or a duplicated
   // delivery) is UPGRADED in place instead of inserted twice.
   const tempId = findTempMatch(cache, message);

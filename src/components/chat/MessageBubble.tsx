@@ -4,7 +4,7 @@ import { AlertCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { ClientMessage } from "@/types/api";
 
-/** Whitespace-only texts are storable server-side (ISSUES.md #8) — collapse. */
+/** Whitespace-only texts are storable server-side (ISSUES.md #8) ,collapse. */
 function renderText(text: string) {
   if (text.trim()) return text;
   return <em className="opacity-60">Empty message</em>;
@@ -18,9 +18,9 @@ export function MessageBubble({
 }: {
   message: ClientMessage;
   mine: boolean;
-  /** Last bubble in a run — tightens the corner nearest the avatar column. */
+  /** Last bubble in a run ,tightens the corner nearest the avatar column. */
   last: boolean;
-  /** Present only on failed sends — renders the retry affordance. */
+  /** Present only on failed sends ,renders the retry affordance. */
   onRetry?: () => void;
 }) {
   const pending = message.status === "pending";

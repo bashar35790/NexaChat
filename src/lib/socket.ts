@@ -3,7 +3,7 @@
 import type { Socket } from "socket.io-client";
 import { API_BASE_URL } from "@/lib/api/client";
 
-/** Socket.io lives at the HOST ROOT — /api is REST-only (API.md §5). */
+/** Socket.io lives at the HOST ROOT ,/api is REST-only (API.md §5). */
 export const SOCKET_URL = API_BASE_URL.replace(/\/api\/?$/, "");
 
 export type ConnectionStatus =
@@ -80,7 +80,7 @@ export async function getSocket(token: string): Promise<Socket> {
   return socketPromise;
 }
 
-/** Idempotent full stop — safe to call from logout paths that may race. */
+/** Idempotent full stop ,safe to call from logout paths that may race. */
 export async function disconnectSocket(): Promise<void> {
   const pending = socketPromise;
   socketPromise = null;

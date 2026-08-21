@@ -6,7 +6,7 @@ import { queryKeys } from "@/lib/api/queryKeys";
 import type { Conversation, User } from "@/types/api";
 
 /**
- * Starts (or reopens) a DM and patches the list cache directly — no refetch.
+ * Starts (or reopens) a DM and patches the list cache directly ,no refetch.
  * The server dedupes by returning the SAME _id for repeat calls, so an
  * existing cache entry is kept as-is; a brand-new conversation is synthesized
  * from the search-result user, whose enriched profile we already hold.

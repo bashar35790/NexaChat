@@ -40,7 +40,7 @@ export function Hero() {
 
           <p className="mx-auto mt-6 max-w-md text-lg leading-relaxed text-muted [text-wrap:pretty] lg:mx-0">
             NexaChat pairs a razor-sharp interface with live sockets, instant
-            people search, and effortless groups — so nothing comes between you
+            people search, and effortless groups ,so nothing comes between you
             and the conversation.
           </p>
 
@@ -84,7 +84,7 @@ export function Hero() {
                 <span className="relative inline-flex size-2 rounded-full bg-success" />
               </span>
             </div>
-            {/* mockup body — live scripted replay (loops; static under reduced motion) */}
+            {/* mockup body ,live scripted replay (loops; static under reduced motion) */}
             <ChatReplay />
           </div>
         </div>

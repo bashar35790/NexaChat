@@ -52,7 +52,7 @@ export default function LoginPage() {
             </span>
           </h1>
           <p className="mt-6 max-w-md text-base leading-relaxed text-muted">
-            One-to-one and group messaging that lands instantly — no inbox,
+            One-to-one and group messaging that lands instantly ,no inbox,
             no noise. Just pick a name, drop your number, and you are in.
           </p>
 

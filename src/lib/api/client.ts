@@ -1,7 +1,7 @@
 import type { ErrorCode, ValidationDetail } from "@/types/api";
 import { isSessionDeadCode } from "@/types/api";
 
-/** REST base — includes the /api prefix (health/socket live at host root instead). */
+/** REST base ,includes the /api prefix (health/socket live at host root instead). */
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://frontend-task-chatapp.onrender.com/api";
@@ -33,7 +33,7 @@ export class ApiError extends Error {
     this.details = details;
   }
 
-  /** True for any 4xx — used by the QueryClient to skip retries. */
+  /** True for any 4xx ,used by the QueryClient to skip retries. */
   get isClientError(): boolean {
     return this.status >= 400 && this.status < 500;
   }
@@ -115,7 +115,7 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
 
 async function parseBody(response: Response): Promise<unknown> {
   // The API can answer 200 with a literally empty/null body (silent-failure
-  // send — ISSUES.md #9), so absence of JSON must not throw here.
+  // send ,ISSUES.md #9), so absence of JSON must not throw here.
   const text = await response.text();
   if (!text || text === "null") return null;
   try {
@@ -133,7 +133,7 @@ async function toApiError(response: Response, data: unknown): Promise<ApiError> 
   const envelope = data as { error?: unknown } | null;
   const error = envelope?.error;
 
-  // Shape A — structured envelope {error: {code, message, details?}}.
+  // Shape A ,structured envelope {error: {code, message, details?}}.
   if (
     typeof error === "object" &&
     error !== null &&
@@ -150,7 +150,7 @@ async function toApiError(response: Response, data: unknown): Promise<ApiError> 
     return new ApiError(shaped.message, response.status, shaped.code, shaped.details);
   }
 
-  // Shape B — bare-string {error: "..."} (observed on group-permission 403s);
+  // Shape B ,bare-string {error: "..."} (observed on group-permission 403s);
   // the server text is the clearest thing to surface, so keep it verbatim.
   if (typeof error === "string" && error) {
     return new ApiError(error, response.status, "SERVER_ERROR");

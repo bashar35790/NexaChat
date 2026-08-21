@@ -1,5 +1,5 @@
 /**
- * Lightweight subsequence fuzzy matcher — no dependency. Returns a score
+ * Lightweight subsequence fuzzy matcher ,no dependency. Returns a score
  * (higher = better) or null when the query isn't a subsequence of the text.
  * Scoring favors word-boundary and consecutive matches, case-insensitive.
  */

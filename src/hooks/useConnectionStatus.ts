@@ -10,7 +10,7 @@ import {
 
 /**
  * Reactive view of the transport status. `reconnecting` is only true for
- * disruptions AFTER a successful handshake — the initial connect stays silent.
+ * disruptions AFTER a successful handshake ,the initial connect stays silent.
  */
 export function useConnectionStatus(): {
   status: ConnectionStatus;

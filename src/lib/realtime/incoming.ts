@@ -58,7 +58,7 @@ function resolveSenderName(
 
 /**
  * Server→client fan-out for new messages (server does NOT echo the sender's
- * own sends — those are confirmed via the REST response in useSendMessage).
+ * own sends ,those are confirmed via the REST response in useSendMessage).
  * Updates every loaded messages cache for the target conversation plus the
  * conversations preview/order, tolerating caches that don't exist yet.
  */
@@ -107,7 +107,7 @@ export function applyIncomingMessage(
 /**
  * Group create/rename/membership/admin changes broadcast this event to every
  * member EXCEPT the actor (who already patched their cache from the REST
- * response). Payload is a PARTIAL entity — merge, never replace, so the
+ * response). Payload is a PARTIAL entity ,merge, never replace, so the
  * locally-known lastMessage/updatedAt ordering survives intact. Unknown
  * conversation ids (e.g. someone created a group with me just now) trigger a
  * list refetch since the partial can't synthesize a valid entity.

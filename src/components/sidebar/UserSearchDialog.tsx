@@ -36,7 +36,7 @@ export function UserSearchDialog({
   const tooShort = debounced.length < MIN_QUERY_LENGTH;
 
   // Highlight auto-resets to 0 whenever the result set changes (derived from
-  // the query it belongs to — no effect needed) and clamps to bounds.
+  // the query it belongs to ,no effect needed) and clamps to bounds.
   const [highlightState, setHighlightState] = useState({ q: "", index: 0 });
   const highlight =
     highlightState.q === debounced

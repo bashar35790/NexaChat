@@ -4,7 +4,7 @@ import { request } from "./client";
 /**
  * Single endpoint handles signup AND login (upsert semantics): a new phone
  * registers, an existing phone logs in and silently adopts the given name
- * (ISSUES.md #4). No server-side phone validation exists — enforce E.164-ish
+ * (ISSUES.md #4). No server-side phone validation exists ,enforce E.164-ish
  * format in the form layer before calling.
  */
 export function login(payload: { phone: string; name: string }): Promise<LoginResponse> {

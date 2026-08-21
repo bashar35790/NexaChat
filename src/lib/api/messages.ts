@@ -15,7 +15,7 @@ export interface HistoryParams {
 }
 
 /**
- * Newest-first cursor pages. ⚠️ The `before` cursor is INCLUSIVE — the boundary
+ * Newest-first cursor pages. ⚠️ The `before` cursor is INCLUSIVE ,the boundary
  * message re-appears at the top of the next page, so cache prepends must
  * dedupe by id (ISSUES.md #11/#12).
  */
@@ -37,7 +37,7 @@ export interface SendMessagePayload {
 }
 
 /**
- * Returns the full created message entity — required for replacing optimistic
+ * Returns the full created message entity ,required for replacing optimistic
  * temp bubbles by server id. ⚠️ A nonexistent conversation answers HTTP 200
  * with body `null`; we normalize that silent failure into a thrown ApiError so
  * mutation onError paths stay uniform (ISSUES.md #9).
@@ -51,7 +51,7 @@ export async function sendMessage(
   });
   if (!message) {
     throw new ApiError(
-      "Message could not be delivered — conversation not found.",
+      "Message could not be delivered ,conversation not found.",
       200,
       "NOT_FOUND",
     );

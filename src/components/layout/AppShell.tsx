@@ -9,7 +9,7 @@ import { useUiStore } from "@/stores/uiStore";
  * Responsive workspace shell (plan §5):
  * - ≥1024px: persistent 360px sidebar beside the chat panel.
  * - 768–1023px: sidebar as an overlay drawer (menu button in chat area).
- * - <768px: single-pane switcher — list ⇄ conversation via uiStore.
+ * - <768px: single-pane switcher ,list ⇄ conversation via uiStore.
  */
 export function AppShell({
   sidebar,

@@ -25,7 +25,7 @@ export function renameGroup(conversationId: string, name: string): Promise<Group
   });
 }
 
-/** Admins only. Unknown userId currently crashes the server (500 — ISSUES.md #10). */
+/** Admins only. Unknown userId currently crashes the server (500 ,ISSUES.md #10). */
 export function addGroupParticipants(
   conversationId: string,
   userIds: string[],
@@ -37,7 +37,7 @@ export function addGroupParticipants(
 }
 
 /**
- * Removes a member (admins only). Passing your OWN id leaves the group — any
+ * Removes a member (admins only). Passing your OWN id leaves the group ,any
  * member may leave. A departing sole admin auto-transfers adminship server-side.
  */
 export function removeGroupParticipant(

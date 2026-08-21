@@ -65,7 +65,7 @@ export function LoginForm({ onAuthenticate }: LoginFormProps) {
         phone: normalizePhone(values.phone).value,
       });
     } catch (error) {
-      // Server VALIDATION_ERROR carries details[{path,message}] — route those
+      // Server VALIDATION_ERROR carries details[{path,message}] ,route those
       // to their fields instead of the generic banner.
       if (
         error instanceof ApiError &&
@@ -125,7 +125,7 @@ export function LoginForm({ onAuthenticate }: LoginFormProps) {
         inputMode="tel"
         placeholder="+1 555 000 0001"
         autoComplete="tel"
-        hint="Include your country code — spaces and dashes are cleaned automatically."
+        hint="Include your country code ,spaces and dashes are cleaned automatically."
         value={values.phone}
         onChange={(e) => setField("phone", e.target.value)}
         onBlur={() =>

@@ -1,5 +1,5 @@
 /**
- * Central query-key factory — the ONLY place raw key arrays are constructed,
+ * Central query-key factory ,the ONLY place raw key arrays are constructed,
  * so cache invalidation/patching (socket events, optimistic sends) can target
  * data precisely. Shapes: [conversations], [messages, id, cursor], [users, q].
  * The pagination cursor lives in useInfiniteQuery's pageParam, not the key.

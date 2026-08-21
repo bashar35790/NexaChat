@@ -106,7 +106,7 @@ export function ChatMessages({ conversation }: { conversation: Conversation }) {
             className="h-full"
             icon={<Sparkles />}
             title="No messages yet"
-            description="Send the first message — say hi."
+            description="Send the first message ,say hi."
           />
         ) : (
           <>

@@ -36,7 +36,7 @@ interface CommandItem {
 
 /**
  * ⌘K quick switcher (plan §10): fuzzy-jump to any conversation or person,
- * plus app actions. The global shortcut lives here — the palette is mounted
+ * plus app actions. The global shortcut lives here ,the palette is mounted
  * once inside the authenticated tree. People results come from the live
  * directory search once the query is long enough; everything else filters
  * locally by subsequence score.
@@ -166,7 +166,7 @@ export function CommandPalette() {
 
   const peopleItems: CommandItem[] = useMemo(() => {
     if (!query) return [];
-    // Directory search includes the caller — hide yourself from "People".
+    // Directory search includes the caller ,hide yourself from "People".
     return (peopleQuery.data ?? [])
       .filter((user) => user._id !== meId)
       .slice(0, 4)
@@ -194,7 +194,7 @@ export function CommandPalette() {
     ];
   const flat = sections.flatMap((section) => section.items);
 
-  // Highlight resets whenever the query changes — derived-state-during-render
+  // Highlight resets whenever the query changes ,derived-state-during-render
   // (the sanctioned alternative to a setState-in-effect reset).
   const [highlight, setHighlight] = useState({ index: 0, query: "" });
   if (highlight.query !== rawQuery) {
@@ -272,7 +272,7 @@ export function CommandPalette() {
               ? "Keep typing to search people…"
               : query
                 ? "Nothing matches that."
-                : "Type to jump anywhere — or pick an action below."}
+                : "Type to jump anywhere ,or pick an action below."}
           </p>
         ) : (
           sections.map((section) =>

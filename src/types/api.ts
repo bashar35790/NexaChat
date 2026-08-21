@@ -1,5 +1,5 @@
 /**
- * API entity types — transcribed verbatim from live observations in Phase 1.
+ * API entity types ,transcribed verbatim from live observations in Phase 1.
  * Source of truth: docs/API.md + docs/probing-notes.md (+ docs/openapi.yaml).
  * Do not "improve" shapes here: quirks like the empty `lastMessage` object or the
  * bare-ids `participants` array on conversation create are intentional encodings
@@ -31,7 +31,7 @@ export interface MessagePreview {
 
 /**
  * The server returns `{}` for conversations with zero messages, so every field
- * is optional at the type level too — consumers must narrow before rendering.
+ * is optional at the type level too ,consumers must narrow before rendering.
  */
 export type ConversationLastMessage = Partial<MessagePreview>;
 
@@ -57,7 +57,7 @@ export interface GroupConversation extends ConversationBase {
 
 export type Conversation = DirectConversation | GroupConversation;
 
-/** POST /api/conversations response — note: bare id list, NOT enriched users. */
+/** POST /api/conversations response ,note: bare id list, NOT enriched users. */
 export interface CreatedDirectConversation {
   _id: ObjectId;
   participants: ObjectId[];
@@ -68,10 +68,10 @@ export interface Message {
   _id: ObjectId;
   /** Field is named `conversation` (not `conversationId`) per observed payloads. */
   conversation: ObjectId;
-  /** Bare sender id — resolve display names via the parent conversation. */
+  /** Bare sender id ,resolve display names via the parent conversation. */
   sender: ObjectId;
   text: string;
-  /** ISO-8601 string over REST (WS events use epoch millis — normalize first). */
+  /** ISO-8601 string over REST (WS events use epoch millis ,normalize first). */
   createdAt: string;
 }
 
@@ -104,7 +104,7 @@ export const ERROR_CODES = [
 
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
-/** Missing-token is HTTP 400 NO_TOKEN (not 401) — both mean "session dead". */
+/** Missing-token is HTTP 400 NO_TOKEN (not 401) ,both mean "session dead". */
 export function isSessionDeadCode(code: ErrorCode): boolean {
   return code === "NO_TOKEN" || code === "INVALID_TOKEN";
 }
@@ -139,7 +139,7 @@ export interface RawSocketMessage {
 }
 
 /**
- * `conversation:updated` payload — a PARTIAL group entity (probed live):
+ * `conversation:updated` payload ,a PARTIAL group entity (probed live):
  * REST-style `_id` + enriched participants, but NO lastMessage/updatedAt, so
  * it must be MERGED into the cached conversation rather than replacing it.
  */

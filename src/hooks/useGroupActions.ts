@@ -16,7 +16,7 @@ import { useAuthStore } from "@/stores/authStore";
 import type { Conversation, GroupConversation } from "@/types/api";
 
 /**
- * All group mutations answer with the FULL refreshed entity — every hook
+ * All group mutations answer with the FULL refreshed entity ,every hook
  * patches the conversations cache directly from the response (no refetch).
  * Permission failures (403) surface to callers as thrown errors → toast.
  */

@@ -14,7 +14,7 @@ export type SessionStatus = "restoring" | "authenticated" | "unauthenticated";
  * Session lifecycle (plan §3): hydrate persisted store → validate token via
  * GET /auth/me → dead token clears the store and redirects to /login.
  *
- * Transient failures (network/5xx) do NOT kill the session — the user stays
+ * Transient failures (network/5xx) do NOT kill the session ,the user stays
  * authenticated on their persisted token and inner screens render retryable
  * error states instead.
  */
@@ -28,7 +28,7 @@ export function useAuthSession(): SessionStatus {
   // so a valid session is never mistaken for a missing one mid-hydration.
   // useSyncExternalStore keeps SSR (server snapshot: false → "restoring")
   // mismatch-free; on the server `window` is undefined, so zustand's persist
-  // never even attaches its api — the ?? true fallback covers that shape.
+  // never even attaches its api ,the ?? true fallback covers that shape.
   const hydrated = useSyncExternalStore(
     (onStoreChange) => {
       const persistApi = useAuthStore.persist;

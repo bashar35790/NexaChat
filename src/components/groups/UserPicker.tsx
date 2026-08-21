@@ -32,7 +32,7 @@ export function UserPicker({
 
   // Server matches are case-sensitive name-PREFIX only (ISSUES.md #5); regex
   // metachars crash it, but typed input is matched server-side so no escaping
-  // is needed here. Directory dumps include the caller — hide them plus
+  // is needed here. Directory dumps include the caller ,hide them plus
   // already-selected/excluded entries.
   const results = useMemo(
     () =>

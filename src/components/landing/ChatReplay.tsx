@@ -12,7 +12,7 @@ interface ReplayLine {
 const SCRIPT: ReplayLine[] = [
   { mine: false, text: "Welcome to NexaChat." },
   { mine: true, text: "Messages arrive the instant they're sent." },
-  { mine: false, text: "Pull up a chair — the whole crew is here." },
+  { mine: false, text: "Pull up a chair ,the whole crew is here." },
   { mine: true, text: "Groups too? I manage three teams from here now." },
   { mine: false, text: "Search a name, say hi. That's the whole trick." },
 ];
@@ -47,7 +47,7 @@ export function ChatReplay() {
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (reduced) return; // static transcript path — no timers at all
+    if (reduced) return; // static transcript path ,no timers at all
     let cancelled = false;
     const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

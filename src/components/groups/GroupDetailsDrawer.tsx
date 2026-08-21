@@ -33,7 +33,7 @@ import type { GroupConversation, User } from "@/types/api";
  * Right-side slide-over with the group's member roster plus admin management
  * actions (T8.2/T8.3): inline rename, add members, remove, promote. Admin
  * controls render ONLY for admins; server permission rules remain the source
- * of truth — violations surface as error toasts.
+ * of truth ,violations surface as error toasts.
  */
 export function GroupDetailsDrawer({
   conversation,
@@ -51,7 +51,7 @@ export function GroupDetailsDrawer({
 
   const isAdmin = conversation.admins.includes(meId ?? "");
 
-  // Admins first, then alphabetical — roles stay scannable.
+  // Admins first, then alphabetical ,roles stay scannable.
   const members = useMemo(
     () =>
       [...conversation.participants].sort((a, b) => {
@@ -282,7 +282,7 @@ export function GroupDetailsDrawer({
                   const isSelf = member._id === meId;
                   const memberIsAdmin = conversation.admins.includes(member._id);
                   // No demotion endpoint exists; self-management is the leave
-                  // flow — so the menu only targets other regular members.
+                  // flow ,so the menu only targets other regular members.
                   const actionable = isAdmin && !isSelf && !memberIsAdmin;
                   return (
                     <li
@@ -436,7 +436,7 @@ export function GroupDetailsDrawer({
         title="Leave this group?"
         body={
           isAdmin && conversation.admins.length === 1
-            ? "You're the only admin — adminship will transfer to another member automatically."
+            ? "You're the only admin ,adminship will transfer to another member automatically."
             : "You'll lose access to this group's messages. You can only rejoin if an admin adds you back."
         }
         confirmLabel="Leave group"

@@ -9,7 +9,7 @@ const STICK_THRESHOLD_PX = 120;
 
 interface ChatScrollOptions {
   /**
-   * Ascending-chronological messages — identity (ids + senders) drives stick,
+   * Ascending-chronological messages ,identity (ids + senders) drives stick,
    * unread, and first-unread decisions. ID anchoring means pagination
    * prepends never register as arrivals.
    */
@@ -23,7 +23,7 @@ interface FeedState {
   /** Id of the newest message accounted for (anchor for append detection). */
   lastId: string | null;
   unread: number;
-  /** First message that arrived while away — renders the "New" divider. */
+  /** First message that arrived while away ,renders the "New" divider. */
   firstUnreadId: string | null;
 }
 

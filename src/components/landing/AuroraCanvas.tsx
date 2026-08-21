@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-/** Drifting radial-gradient orbs — matches the login screen's CSS aurora. */
+/** Drifting radial-gradient orbs ,matches the login screen's CSS aurora. */
 const ORBS = [
   { rgb: "99,102,241", x: 0.22, y: 0.3, r: 0.48, dx: 0.1, dy: -0.06, speed: 0.13, phase: 0 },
   { rgb: "139,92,246", x: 0.78, y: 0.24, r: 0.4, dx: -0.08, dy: 0.07, speed: 0.11, phase: 2.1 },
