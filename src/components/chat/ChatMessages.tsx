@@ -65,13 +65,19 @@ export function ChatMessages({ conversation }: { conversation: Conversation }) {
     [sendMutation],
   );
 
-  const { containerRef, loadOlder, atBottom, unreadCount, scrollToBottom } =
-    useChatScroll({
-      messageCount: messages?.length ?? 0,
-      fetchNextPage,
-      hasNextPage: Boolean(hasNextPage),
-      isFetchingNextPage,
-    });
+  const {
+    containerRef,
+    loadOlder,
+    atBottom,
+    unreadCount,
+    firstUnreadId,
+    scrollToBottom,
+  } = useChatScroll({
+    messages: messages ?? [],
+    fetchNextPage,
+    hasNextPage: Boolean(hasNextPage),
+    isFetchingNextPage,
+  });
 
   const scrollToBottomSmooth = useCallback(() => {
     const reduced = window.matchMedia(
@@ -118,6 +124,7 @@ export function ChatMessages({ conversation }: { conversation: Conversation }) {
             <MessageList
               messages={messages}
               conversation={conversation}
+              firstUnreadId={firstUnreadId}
               onRetry={(message) =>
                 void handleSend({ text: message.text, failedTempId: message._id })
               }

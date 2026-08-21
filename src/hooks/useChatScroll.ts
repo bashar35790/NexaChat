@@ -1,27 +1,42 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useAuthStore } from "@/stores/authStore";
+import type { ClientMessage } from "@/types/api";
 
 /** Stick-to-bottom tolerance (plan §5 contract). */
 const STICK_THRESHOLD_PX = 120;
 
 interface ChatScrollOptions {
-  /** Flattened message count — its changes drive stick/unread decisions. */
-  messageCount: number;
+  /**
+   * Ascending-chronological messages — identity (ids + senders) drives stick,
+   * unread, and first-unread decisions. ID anchoring means pagination
+   * prepends never register as arrivals.
+   */
+  messages: ClientMessage[];
   fetchNextPage: () => Promise<unknown>;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+}
+
+interface FeedState {
+  /** Id of the newest message accounted for (anchor for append detection). */
+  lastId: string | null;
+  unread: number;
+  /** First message that arrived while away — renders the "New" divider. */
+  firstUnreadId: string | null;
 }
 
 /**
  * Auto-scroll engine for the message feed (plan §5 contract):
  * - prepends restore exact viewport position (zero visual jump);
  * - growth sticks to bottom ONLY while the user is within ~120px of it;
- * - otherwise arrivals accumulate into an unread count surfaced as a pill;
- * - returning to the bottom clears the count and resumes stickiness.
+ * - otherwise arrivals accumulate into an unread count surfaced as a pill,
+ *   and the first unseen OTHER-person message gets a divider marker;
+ * - returning to the bottom clears both and resumes stickiness.
  */
 export function useChatScroll({
-  messageCount,
+  messages,
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
@@ -32,17 +47,34 @@ export function useChatScroll({
   /** Ref mirror for imperative/layout-effect decisions (no stale closures). */
   const atBottomRef = useRef(true);
 
+  const meId = useAuthStore((s) => s.user?._id);
+  const lastMessageId = messages.at(-1)?._id ?? null;
+
   const [atBottom, setAtBottom] = useState(true);
   // Single source of truth for arrival accounting; adjusted during render
-  // (derived-state pattern) because it is fully derived from messageCount.
-  // Uses the at-bottom STATE (render-safe); starts true so the very first
-  // page load never counts as unread.
-  const [feed, setFeed] = useState({ seen: messageCount, unread: 0 });
-  if (feed.seen !== messageCount) {
-    const added = messageCount - feed.seen;
+  // (derived-state pattern) because it is fully derived from `messages`.
+  // Uses the at-bottom STATE (render-safe); anchored to the first rendered
+  // page so the very first load never counts as unread.
+  const [feed, setFeed] = useState<FeedState>(() => ({
+    lastId: lastMessageId,
+    unread: 0,
+    firstUnreadId: null,
+  }));
+  if (feed.lastId !== lastMessageId) {
+    const anchorIndex = feed.lastId
+      ? messages.findIndex((m) => m._id === feed.lastId)
+      : -1;
+    // Anchor lost (full cache replace / deduped re-sort): absorb silently —
+    // only a verifiable append counts as an arrival.
+    const appended =
+      anchorIndex >= 0 ? messages.slice(anchorIndex + 1) : [];
+    const incoming = appended.filter((m) => m.sender !== meId);
+    const away = appended.length > 0 && !atBottom;
     setFeed({
-      seen: messageCount,
-      unread: added > 0 && !atBottom ? feed.unread + added : 0,
+      lastId: lastMessageId,
+      unread: away ? feed.unread + incoming.length : 0,
+      firstUnreadId:
+        away ? (feed.firstUnreadId ?? incoming[0]?._id ?? null) : null,
     });
   }
 
@@ -63,7 +95,9 @@ export function useChatScroll({
       setAtBottom(bottom);
       if (bottom) {
         setFeed((current) =>
-          current.unread === 0 ? current : { ...current, unread: 0 },
+          current.unread === 0 && current.firstUnreadId === null
+            ? current
+            : { ...current, unread: 0, firstUnreadId: null },
         );
       }
     };
@@ -81,16 +115,16 @@ export function useChatScroll({
       restoreRef.current = null;
     }
 
-    const previous = prevCountRef.current;
-    prevCountRef.current = messageCount;
-    if (!el || messageCount <= previous) return;
+    const previousCount = prevCountRef.current;
+    prevCountRef.current = messages.length;
+    if (!el || messages.length <= previousCount) return;
     // First load of a conversation, or user already near the bottom: follow.
-    if (previous === 0 || atBottomRef.current) {
+    if (previousCount === 0 || atBottomRef.current) {
       el.scrollTop = el.scrollHeight;
       atBottomRef.current = true;
       setAtBottom(true);
     }
-  }, [messageCount]);
+  }, [messages.length]);
 
   const loadOlder = useCallback(() => {
     const el = containerRef.current;
@@ -99,5 +133,12 @@ export function useChatScroll({
     void fetchNextPage();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  return { containerRef, loadOlder, atBottom, unreadCount: feed.unread, scrollToBottom };
+  return {
+    containerRef,
+    loadOlder,
+    atBottom,
+    unreadCount: feed.unread,
+    firstUnreadId: feed.firstUnreadId,
+    scrollToBottom,
+  };
 }

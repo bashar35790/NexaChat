@@ -13,10 +13,13 @@ import { DaySeparator } from "./DaySeparator";
 export function MessageList({
   messages,
   conversation,
+  firstUnreadId,
   onRetry,
 }: {
   messages: ClientMessage[];
   conversation: Conversation;
+  /** First message that arrived while the user was scrolled away. */
+  firstUnreadId?: string | null;
   /** Retry affordance for failed sends (passed to matching bubbles). */
   onRetry?: (message: ClientMessage) => void;
 }) {
@@ -34,6 +37,7 @@ export function MessageList({
               key={`${day.key}-${index}-${run.sender}`}
               run={run}
               conversation={conversation}
+              firstUnreadId={firstUnreadId}
               onRetry={onRetry}
             />
           ))}
