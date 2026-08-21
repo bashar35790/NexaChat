@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { MessageCircle, Search, Users } from "lucide-react";
 import { ProfileRow } from "./ProfileRow";
 import { ConversationList } from "./ConversationList";
@@ -15,9 +14,10 @@ export function Sidebar() {
   const searchOpen = useUiStore((s) => s.searchOpen);
   const setSearchOpen = useUiStore((s) => s.setSearchOpen);
   const openConversation = useUiStore((s) => s.openConversation);
+  const groupWizardOpen = useUiStore((s) => s.groupWizardOpen);
+  const setGroupWizardOpen = useUiStore((s) => s.setGroupWizardOpen);
   const startDm = useStartDirectConversation();
   const toast = useToast();
-  const [groupWizardOpen, setGroupWizardOpen] = useState(false);
 
   async function handleSelectUser(user: User) {
     try {
