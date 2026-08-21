@@ -74,9 +74,8 @@ export function UserSearchDialog({
     >
       <Input
         label="Find someone"
-        placeholder="Start of a name, e.g. Ada"
-        // Server matches are case-sensitive name-PREFIX only (ISSUES.md #5).
-        hint="Matches the start of a name. At least 2 characters."
+        placeholder="Name or phone number, e.g. Ada or +1555…"
+        hint="Search by display name or phone number. At least 2 characters."
         value={rawQuery}
         onChange={(e) => setRawQuery(e.target.value)}
         onKeyDown={handleKeyDown}

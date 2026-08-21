@@ -76,8 +76,8 @@ export function UserPicker({
     <>
       <Input
         label="Add people"
-        placeholder="Start of a name, e.g. Ada"
-        hint="Matches the start of a name. At least 2 characters."
+        placeholder="Name or phone number, e.g. Ada or +1555…"
+        hint="Search by display name or phone number. At least 2 characters."
         value={rawQuery}
         onChange={(e) => setRawQuery(e.target.value)}
         onKeyDown={handleKeyDown}
