@@ -109,3 +109,37 @@ Takeaways: assignment's "empty messages must not be sendable" must be enforced *
 (trim + disabled composer). Optimistic replace uses the returned `_id`. Null-response detection needed
 for the bogus-conversation edge.
 
+## POST /api/conversations/group
+
+| Case | Status | Observed |
+|---|---|---|
+| Create with only 1 other (2 total) | 400 | `VALIDATION_ERROR details[{path:"participantIds", message:"a group needs at least 3 members"}]` — server enforces the rule |
+| Valid create (`participantIds` = 2 others) | **201** | Full enriched entity `{_id, type:"group", name, createdBy, admins:[ids], participants:[user objects], createdAt, updatedAt}` |
+
+Quirk: group create returns **201**, but DM create returns **200** — inconsistent status conventions.
+
+## PATCH /api/conversations/{id} (rename)
+
+| Case | Status | Observed |
+|---|---|---|
+| Admin renames | 200 | Full enriched entity, updated `name`/`updatedAt` |
+| Non-admin member | 403 | `{"error":{"message":"Only admins can rename the group","code":"FORBIDDEN"}}` |
+| Non-member | 403 | Same FORBIDDEN shape — does not leak membership info |
+
+## POST …/participants · DELETE …/participants/{userId} · POST …/admins
+
+| Case | Status | Observed |
+|---|---|---|
+| Admin adds member | 200 | Full entity incl. new participant |
+| Add nonexistent user id | **500** | `SERVER_ERROR` Mongo crash instead of clean `UNKNOWN_USER` *(quirk)* |
+| Admin promotes member | 200 | Entity with expanded `admins[]`; promoted admin gains full powers immediately |
+| Non-admin promote attempt | 403 | `"Only admins can promote members"` |
+| Admin removes member | 200 | Entity without removed participant |
+| Member leaves via own id | 200 | Entity without leaver; list reflects removal on next fetch |
+| **Sole admin leaves** | 200 | **Adminship auto-transfers to a remaining participant** — group survives with new admin |
+| Malformed path id (url-encoded newline) | 500 | Raw `Cast to ObjectId … SERVER_ERROR` leak *(harness artifact, also documents server behavior on bad ids)* |
+
+Group takeaways: every mutation returns the full refreshed entity → use it to patch the query cache
+directly without refetching. Permission errors are uniform `403 FORBIDDEN` with human messages.
+Client wizard must enforce ≥2 selected others (server message verbatim available for inline errors).
+
