@@ -27,3 +27,26 @@
 - Token failure has TWO variants: `400 NO_TOKEN` and `401 INVALID_TOKEN` → both must trigger
   single-flight force-logout (not just HTTP 401 checks).
 - Validation errors carry structured `details[{path,message}]` → mapable to inline form errors.
+
+## GET /api/users/search?q=
+
+| Case | Status | Observed |
+|---|---|---|
+| `q=Bob` (capital) | 200 | Array of `{_id, name, phone}` — all names starting with exact-case `Bob` |
+| `q=bob`, `q=bo` (lowercase) | 200 | `[]` — **case-sensitive** |
+| `q=marley` (suffix/substring) | 200 | `[]` — **prefix-anchored only**, no substring matching |
+| `q=Ada` | 200 | Multiple users incl. duplicates of same name; **self included in results** |
+| `q=15550000002` (digits only, full number minus `+`) | 200 | `[]` — phones are stored with leading `+`; anchored match never hits |
+| `q=%2B15550000002` (leading `+`) | **500** | `{"error":{"message":"Regular expression is invalid: quantifier does not follow a repeatable item","code":51091}}` — raw Mongo driver error leaked |
+| `q=(` | **500** | Same class: `"Regular expression is invalid: missing closing parenthesis"` — any regex metachar crashes |
+| `q=` (empty) | 200 | **Entire user directory returned**, unpaginated (50+ users observed) |
+| No token | 400 | `NO_TOKEN` |
+
+### Search takeaways for the client
+- Only **name-prefix, case-sensitive** search works reliably. Phone search is effectively broken:
+  without `+` it can't match (anchor), with `+` it throws server 500.
+- Client must sanitize queries (strip regex metacharacters) and treat any 500 as a graceful
+  empty/error state — never surface raw errors.
+- UI copy should hint at prefix matching ("starts with…"); enforce min-length client-side anyway
+  (empty `q` dumps the whole directory).
+
