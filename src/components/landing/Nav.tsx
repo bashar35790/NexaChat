@@ -21,12 +21,12 @@ export function Nav() {
           </span>
         </Link>
 
-        <a
+        <Link
           href="/login"
           className="inline-flex h-9 select-none items-center justify-center gap-2 rounded-full px-4 text-sm font-medium text-muted transition-colors hover:bg-raised hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           Sign in
-        </a>
+        </Link>
       </nav>
     </header>
   );
