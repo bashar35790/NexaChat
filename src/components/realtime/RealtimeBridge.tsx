@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import type { Socket } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket, disconnectSocket } from "@/lib/socket";
-import { applyIncomingMessage } from "@/lib/realtime/incoming";
+import {
+  applyConversationUpdate,
+  applyIncomingMessage,
+} from "@/lib/realtime/incoming";
 import { queryKeys } from "@/lib/api/queryKeys";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { useAuthStore } from "@/stores/authStore";
-import type { RawSocketMessage } from "@/types/api";
+import type {
+  ConversationUpdatedPayload,
+  RawSocketMessage,
+} from "@/types/api";
 
 /**
  * Transport lifecycle + event wiring for the authenticated tree: opens the
@@ -74,6 +80,19 @@ export function RealtimeBridge() {
           );
           setAnnouncement(next);
         });
+        socket.on(
+          "conversation:updated",
+          (raw: ConversationUpdatedPayload) => {
+            if (
+              !raw ||
+              typeof raw._id !== "string" ||
+              typeof raw.type !== "string"
+            ) {
+              return;
+            }
+            applyConversationUpdate(queryClient, raw);
+          },
+        );
       })
       .catch(() => {
         // Handshake failures surface via connection status; nothing to do here.

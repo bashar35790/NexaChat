@@ -137,3 +137,17 @@ export interface RawSocketMessage {
   text: string;
   createdAt: number;
 }
+
+/**
+ * `conversation:updated` payload — a PARTIAL group entity (probed live):
+ * REST-style `_id` + enriched participants, but NO lastMessage/updatedAt, so
+ * it must be MERGED into the cached conversation rather than replacing it.
+ */
+export interface ConversationUpdatedPayload {
+  _id: ObjectId;
+  type: "direct" | "group";
+  name?: string;
+  createdBy?: ObjectId;
+  admins?: ObjectId[];
+  participants?: User[];
+}

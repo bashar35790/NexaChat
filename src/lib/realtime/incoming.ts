@@ -5,7 +5,13 @@ import {
   upsertMessage,
   type MessagesCache,
 } from "@/lib/api/messageCache";
-import type { Conversation, Message, RawSocketMessage } from "@/types/api";
+import { upsertConversation } from "@/lib/api/conversationCache";
+import type {
+  Conversation,
+  ConversationUpdatedPayload,
+  Message,
+  RawSocketMessage,
+} from "@/types/api";
 
 /** Cap for the screen-reader announcement body. */
 const ANNOUNCE_TEXT_LIMIT = 120;
@@ -79,4 +85,42 @@ export function applyIncomingMessage(
       : message.text;
 
   return { announcement: `${senderName}: ${body}` };
+}
+
+/**
+ * Group create/rename/membership/admin changes broadcast this event to every
+ * member EXCEPT the actor (who already patched their cache from the REST
+ * response). Payload is a PARTIAL entity — merge, never replace, so the
+ * locally-known lastMessage/updatedAt ordering survives intact. Unknown
+ * conversation ids (e.g. someone created a group with me just now) trigger a
+ * list refetch since the partial can't synthesize a valid entity.
+ */
+export function applyConversationUpdate(
+  queryClient: QueryClient,
+  payload: ConversationUpdatedPayload,
+): void {
+  const current = queryClient.getQueryData<Conversation[]>(
+    queryKeys.conversations(),
+  );
+  const existing = current?.find((c) => c._id === payload._id);
+
+  if (!existing) {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.conversations() });
+    return;
+  }
+
+  if (existing.type !== "group") return;
+
+  queryClient.setQueryData<Conversation[]>(
+    queryKeys.conversations(),
+    (old) =>
+      old
+        ? upsertConversation(old, {
+            ...existing,
+            name: payload.name ?? existing.name,
+            admins: payload.admins ?? existing.admins,
+            participants: payload.participants ?? existing.participants,
+          })
+        : old,
+  );
 }
