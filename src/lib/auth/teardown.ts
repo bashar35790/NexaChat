@@ -1,13 +1,15 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
+import { disconnectSocket } from "@/lib/socket";
 
 /**
  * Identity-scoped teardown shared by explicit logout AND forced logout on a
- * dead token: wipe the session pair, then wipe ALL TanStack Query caches so
- * the previous account's server data can never leak into the next session.
- * (Phase 7 inserts socket disconnect here, ahead of any state change.)
+ * dead token: kill the socket FIRST so no late events for the old identity
+ * touch fresh caches, wipe the session pair, then wipe ALL TanStack Query
+ * caches so the previous account's server data can never leak into the next.
  */
-export function teardownSession(queryClient: QueryClient): void {
+export async function teardownSession(queryClient: QueryClient): Promise<void> {
+  await disconnectSocket();
   useAuthStore.getState().clear();
   queryClient.clear();
 }

@@ -14,7 +14,7 @@ export function useLogout(): () => void {
   const queryClient = useQueryClient();
 
   return useCallback(() => {
-    teardownSession(queryClient);
+    void teardownSession(queryClient);
     router.replace("/login");
   }, [queryClient, router]);
 }

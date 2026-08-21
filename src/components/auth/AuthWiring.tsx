@@ -24,7 +24,7 @@ export function AuthWiring() {
     setTokenProvider(() => useAuthStore.getState().token);
 
     setForceLogoutHandler(() => {
-      teardownSession(queryClient);
+      void teardownSession(queryClient);
       router.replace("/login");
     });
   }, [router, queryClient]);
