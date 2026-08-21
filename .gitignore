@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# env files
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+
+# build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# prisma
+prisma/dev.db
+prisma/*.db
+server/src/generated/
+
+# planning docs (internal only)
+plan.md
+execution-plan.md
+
+# misc
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# vercel
+.vercel/
+
+# render
+render-output/
+
+# coverage
+coverage/
