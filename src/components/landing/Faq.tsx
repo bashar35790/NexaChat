@@ -73,7 +73,7 @@ export function Faq() {
                     aria-expanded={isOpen}
                     className="flex w-full items-center justify-between gap-4 p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
-                    <span className="font-display text-base font-bold text-white sm:text-lg">
+                    <span className="font-display text-base font-bold text-white sm:text-lg" style={{ color: "#ffffff" }}>
                       {faq.question}
                     </span>
                     <span
@@ -94,7 +94,9 @@ export function Faq() {
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                       >
                         <div className="border-t border-line/50 px-6 pb-6 pt-4 text-sm leading-relaxed text-white sm:text-base font-medium">
-                          {faq.answer}
+                          <p className="text-white font-medium leading-relaxed opacity-100" style={{ color: "#ffffff" }}>
+                            {faq.answer}
+                          </p>
                         </div>
                       </motion.div>
                     ) : null}
