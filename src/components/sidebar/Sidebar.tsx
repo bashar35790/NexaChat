@@ -2,10 +2,11 @@
 
 import { MessageCircle } from "lucide-react";
 import { ProfileRow } from "./ProfileRow";
+import { ConversationList } from "./ConversationList";
 
 /**
  * Sidebar frame. Sections compose in as they are built:
- * conversations list (T5.3), search trigger (T5.4).
+ * search trigger (T5.4).
  */
 export function Sidebar() {
   return (
@@ -21,11 +22,7 @@ export function Sidebar() {
 
       <ProfileRow />
 
-      {/* Conversations list — T5.3 */}
-
-      <div className="flex flex-1 items-center justify-center p-6">
-        <p className="text-sm text-faint">Conversations land here.</p>
-      </div>
+      <ConversationList />
     </>
   );
 }
