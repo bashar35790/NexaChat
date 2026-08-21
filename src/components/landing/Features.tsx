@@ -36,31 +36,34 @@ export function Features() {
     <section id="features" aria-label="Features" className="relative">
       <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display font-semibold tracking-tight [font-size:clamp(1.75rem,2.5vw+0.75rem,2.75rem)] [text-wrap:balance]">
+          <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent ring-1 ring-primary/20">
+            Crafted for speed & clarity
+          </p>
+          <h2 className="mt-4 font-display font-bold tracking-tight text-white [font-size:clamp(2rem,3vw+1rem,3.25rem)] [text-wrap:balance]">
             Everything a conversation needs.
           </h2>
-          <p className="mt-4 text-lg text-muted [text-wrap:pretty]">
+          <p className="mt-4 text-lg leading-relaxed text-muted [text-wrap:pretty]">
             No setup ceremonies, no lost threads — just the mechanics of great
-            messaging, done properly.
+            messaging, done properly with luxury engineering.
           </p>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-16 grid gap-8 md:grid-cols-3">
           {FEATURES.map((feature, index) => (
             <Reveal key={feature.title} delay={index * 0.12}>
-              <article className="group flex h-full flex-col overflow-hidden rounded-panel bg-surface ring-1 ring-line transition-shadow duration-300 hover:shadow-panel">
+              <article className="group relative flex h-full flex-col overflow-hidden rounded-panel border border-line bg-surface/60 p-1 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_16px_40px_rgba(99,102,241,0.18)]">
                 <div
                   aria-hidden="true"
-                  className="flex h-40 items-center justify-center border-b border-line bg-gradient-to-br from-primary/10 via-transparent to-transparent"
+                  className="flex h-44 items-center justify-center rounded-t-[1.1rem] border-b border-line bg-gradient-to-br from-primary/15 via-violet/5 to-transparent"
                 >
                   {feature.vignette}
                 </div>
-                <div className="flex flex-1 flex-col gap-2 p-6">
-                  <h3 className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
-                    <span className="flex size-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                <div className="flex flex-1 flex-col gap-3 p-6">
+                  <h3 className="flex items-center gap-3 font-display text-lg font-bold tracking-tight text-white">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/25 to-violet/25 text-white ring-1 ring-primary/40 shadow-glow">
                       {feature.icon}
                     </span>
-                    {feature.title}
+                    <span className="text-white font-display text-lg font-bold">{feature.title}</span>
                   </h3>
                   <p className="text-sm leading-relaxed text-muted">
                     {feature.body}

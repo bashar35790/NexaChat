@@ -64,7 +64,7 @@
   --color-warning: var(--warning);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
 
   --radius-card: var(--radius-card);
   --radius-panel: var(--radius-panel);

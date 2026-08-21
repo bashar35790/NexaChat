@@ -1,6 +1,7 @@
 import { Nav } from "@/components/landing/Nav";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
+import { Faq } from "@/components/landing/Faq";
 import { TechStrip } from "@/components/landing/TechStrip";
 import { CtaBand, Footer } from "@/components/landing/CtaBand";
 
@@ -17,6 +18,7 @@ export default function LandingPage() {
       <main id="main" className="flex-1">
         <Hero />
         <Features />
+        <Faq />
         <TechStrip />
         <CtaBand />
       </main>

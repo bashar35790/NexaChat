@@ -31,7 +31,7 @@ export function Hero() {
             Real-time messaging, zero friction
           </p>
 
-          <h1 className="mt-6 font-display font-semibold tracking-tight [text-wrap:balance] [font-size:clamp(2.5rem,5.5vw+0.75rem,4.5rem)] [line-height:1.05]">
+          <h1 className="mt-6 font-display font-semibold tracking-tight text-white [text-wrap:balance] [font-size:clamp(2.5rem,5.5vw+0.75rem,4.5rem)] [line-height:1.05]">
             Conversations at the{" "}
             <span className="bg-gradient-to-r from-primary via-violet to-accent bg-clip-text text-transparent">
               speed of thought.
