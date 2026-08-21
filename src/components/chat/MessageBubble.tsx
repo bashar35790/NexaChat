@@ -29,11 +29,16 @@ export function MessageBubble({
   return (
     <div
       className={cn(
-        "max-w-[min(75%,34rem)] whitespace-pre-wrap break-words px-3.5 py-2 text-sm leading-relaxed",
+        "max-w-[min(78%,36rem)] whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5",
+        "text-sm leading-[1.6] tracking-[0.01em]",
         mine
-          ? "rounded-2xl bg-gradient-to-br from-primary to-violet text-white shadow-glow"
-          : "bg-raised text-fg ring-1 ring-line",
-        failed && "ring-1 ring-danger/60",
+          ? "bg-gradient-to-br from-primary to-violet text-white shadow-glow"
+          : "bg-raised text-fg",
+        failed
+          ? "ring-1 ring-danger/60"
+          : mine
+            ? "ring-1 ring-white/15"
+            : "ring-1 ring-line",
         pending && "opacity-70",
         last && (mine ? "rounded-br-md" : "rounded-bl-md"),
       )}

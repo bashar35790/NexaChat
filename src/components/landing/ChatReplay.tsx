@@ -99,9 +99,9 @@ export function ChatReplay() {
           className={`flex ${line.mine ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
+            className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-[1.6] tracking-[0.01em] ${
               line.mine
-                ? "rounded-br-md bg-gradient-to-br from-primary to-violet text-white shadow-glow"
+                ? "rounded-br-md bg-gradient-to-br from-primary to-violet text-white ring-1 ring-white/15 shadow-glow"
                 : "rounded-bl-md bg-raised text-fg ring-1 ring-line"
             }`}
           >
