@@ -7,6 +7,7 @@ export interface DropdownItem {
   label: string;
   icon?: React.ReactNode;
   danger?: boolean;
+  disabled?: boolean;
   onSelect: () => void;
 }
 
@@ -68,12 +69,15 @@ export function DropdownMenu({
               key={item.label}
               type="button"
               role="menuitem"
+              disabled={item.disabled}
               onClick={() => {
+                if (item.disabled) return;
                 setOpen(false);
                 item.onSelect();
               }}
               className={cn(
                 "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                item.disabled && "pointer-events-none opacity-40",
                 item.danger
                   ? "text-danger hover:bg-danger/10"
                   : "text-muted hover:bg-raised hover:text-fg",
