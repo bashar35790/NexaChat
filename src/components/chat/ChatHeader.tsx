@@ -6,15 +6,17 @@ import { DropdownMenu } from "@/components/ui/DropdownMenu";
 import type { Conversation } from "@/types/api";
 
 /**
- * Conversation header. Group management actions are placeholders until the
- * groups phase (Phase 8) — server permission rules are the source of truth.
+ * Conversation header. Group management lives in the details drawer
+ * (Phase 8); server permission rules are the source of truth.
  */
 export function ChatHeader({
   conversation,
   onBack,
+  onDetails,
 }: {
   conversation: Conversation;
   onBack: () => void;
+  onDetails: () => void;
 }) {
   const isDirect = conversation.type === "direct";
   const title = isDirect ? conversation.participant.name : conversation.name;
@@ -49,12 +51,10 @@ export function ChatHeader({
             </span>
           }
           items={[
-            // Enabled by the groups phase (T8.2–T8.4).
-            { label: "Group details", onSelect: () => {}, disabled: true },
-            { label: "Rename group", onSelect: () => {}, disabled: true },
+            { label: "Group details", onSelect: onDetails },
             {
               label: "Leave group",
-              onSelect: () => {},
+              onSelect: onDetails,
               disabled: true,
               danger: true,
             },
