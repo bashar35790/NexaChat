@@ -35,7 +35,7 @@ export function MessageRun({
   return (
     <div
       className={cn(
-        "flex items-end gap-2",
+        "flex items-end gap-2.5",
         mine ? "justify-end" : "justify-start",
       )}
     >
@@ -44,13 +44,13 @@ export function MessageRun({
           id={run.sender}
           name={isGroup ? senderName : conversation.participant.name}
           size="xs"
-          className="mb-0.5"
+          className="mb-1 shrink-0"
         />
       ) : null}
 
       <div
         className={cn(
-          "flex min-w-0 flex-col gap-1",
+          "flex min-w-0 flex-col gap-1.5",
           mine ? "items-end" : "items-start",
         )}
       >

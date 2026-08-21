@@ -44,14 +44,14 @@ export function MessageList({
   const days = groupMessages(messages);
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
+    <div className="flex flex-col gap-5 px-5 py-5">
       {days.map((day) => {
         const runContainsFirstUnread = (run: { messages: ClientMessage[] }) =>
           firstUnreadId != null &&
           run.messages.some((m) => m._id === firstUnreadId);
 
         return (
-          <div key={day.key} className="flex flex-col gap-3">
+          <div key={day.key} className="flex flex-col gap-3.5">
             <DaySeparator
               label={formatDayLabel(day.runs[0]?.messages[0]?.createdAt ?? "")}
             />

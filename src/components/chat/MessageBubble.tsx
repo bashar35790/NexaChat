@@ -29,8 +29,9 @@ export function MessageBubble({
   return (
     <div
       className={cn(
-        "max-w-[min(78%,36rem)] whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5",
-        "text-sm leading-[1.6] tracking-[0.01em]",
+        "max-w-[min(76%,34rem)] min-w-[4rem] whitespace-pre-wrap break-words",
+        "rounded-2xl px-4 py-3",
+        "text-[0.9375rem] font-normal leading-[1.65] tracking-normal",
         mine
           ? "bg-gradient-to-br from-primary to-violet text-white shadow-glow"
           : "bg-raised text-fg",
@@ -40,14 +41,14 @@ export function MessageBubble({
             ? "ring-1 ring-white/15"
             : "ring-1 ring-line",
         pending && "opacity-70",
-        last && (mine ? "rounded-br-md" : "rounded-bl-md"),
+        last && (mine ? "rounded-br-[6px]" : "rounded-bl-[6px]"),
       )}
     >
       {renderText(message.text)}
 
       {pending ? (
         <Clock
-          className="ml-1 inline size-3 align-baseline opacity-80"
+          className="ml-1.5 inline size-3 align-baseline opacity-70"
           aria-label="Sending"
         />
       ) : null}
