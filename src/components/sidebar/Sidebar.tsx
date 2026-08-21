@@ -1,10 +1,11 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { ProfileRow } from "./ProfileRow";
 
 /**
  * Sidebar frame. Sections compose in as they are built:
- * profile row (T5.2), conversations list (T5.3), search trigger (T5.4).
+ * conversations list (T5.3), search trigger (T5.4).
  */
 export function Sidebar() {
   return (
@@ -18,7 +19,8 @@ export function Sidebar() {
         </span>
       </div>
 
-      {/* Profile row — T5.2 */}
+      <ProfileRow />
+
       {/* Conversations list — T5.3 */}
 
       <div className="flex flex-1 items-center justify-center p-6">
