@@ -3,11 +3,13 @@
 import { MessageCircle, Sparkles } from "lucide-react";
 import { ChatHeader } from "./ChatHeader";
 import { MessageList } from "./MessageList";
+import { LoadOlderSentinel } from "./LoadOlderSentinel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useConversations } from "@/hooks/useConversations";
 import { useInfiniteMessages } from "@/hooks/useInfiniteMessages";
+import { useChatScroll } from "@/hooks/useChatScroll";
 import { cn } from "@/lib/utils/cn";
 import { useUiStore } from "@/stores/uiStore";
 
@@ -45,7 +47,16 @@ export function ChatPanel() {
     isPending,
     isError,
     refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useInfiniteMessages(conversation?._id ?? null);
+  const { containerRef, loadOlder } = useChatScroll({
+    messageCount: messages?.length ?? 0,
+    fetchNextPage,
+    hasNextPage: Boolean(hasNextPage),
+    isFetchingNextPage,
+  });
 
   if (!conversation) {
     return (
@@ -80,7 +91,21 @@ export function ChatPanel() {
     );
   } else {
     body = (
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-y-auto overscroll-contain"
+      >
+        <LoadOlderSentinel
+          containerRef={containerRef}
+          onLoad={loadOlder}
+          disabled={!hasNextPage || isFetchingNextPage}
+          loading={isFetchingNextPage}
+        />
+        {!hasNextPage && messages.length > 0 ? (
+          <p className="py-2 text-center text-[11px] text-faint">
+            This is the beginning of your conversation.
+          </p>
+        ) : null}
         <MessageList messages={messages} conversation={conversation} />
       </div>
     );
