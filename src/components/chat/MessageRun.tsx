@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils/cn";
+import { formatTime } from "@/lib/utils/date";
 import { hueOf } from "@/components/ui/Avatar";
 import { Avatar } from "@/components/ui/Avatar";
 import { useAuthStore } from "@/stores/authStore";
@@ -67,6 +68,13 @@ export function MessageRun({
             last={index === run.messages.length - 1}
           />
         ))}
+
+        {(() => {
+          const time = formatTime(run.messages.at(-1)?.createdAt ?? "");
+          return time ? (
+            <span className="px-1 text-[10px] text-faint">{time}</span>
+          ) : null;
+        })()}
       </div>
     </div>
   );
