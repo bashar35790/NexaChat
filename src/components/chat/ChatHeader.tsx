@@ -13,10 +13,12 @@ export function ChatHeader({
   conversation,
   onBack,
   onDetails,
+  onLeave,
 }: {
   conversation: Conversation;
   onBack: () => void;
   onDetails: () => void;
+  onLeave: () => void;
 }) {
   const isDirect = conversation.type === "direct";
   const title = isDirect ? conversation.participant.name : conversation.name;
@@ -52,12 +54,7 @@ export function ChatHeader({
           }
           items={[
             { label: "Group details", onSelect: onDetails },
-            {
-              label: "Leave group",
-              onSelect: onDetails,
-              disabled: true,
-              danger: true,
-            },
+            { label: "Leave group", onSelect: onLeave, danger: true },
           ]}
         />
       ) : null}

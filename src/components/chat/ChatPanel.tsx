@@ -9,6 +9,8 @@ import { GroupDetailsDrawer } from "@/components/groups/GroupDetailsDrawer";
 import { useConversations } from "@/hooks/useConversations";
 import { useUiStore } from "@/stores/uiStore";
 
+type DrawerMode = "details" | "leave";
+
 /**
  * Right-hand chat panel: header + message area. The composer lives inside
  * ChatMessages so it stays mounted across loading states.
@@ -17,7 +19,7 @@ export function ChatPanel() {
   const activeId = useUiStore((s) => s.activeConversationId);
   const setMobilePane = useUiStore((s) => s.setMobilePane);
   const { data: conversations } = useConversations();
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<DrawerMode | null>(null);
 
   const conversation = conversations?.find((c) => c._id === activeId) ?? null;
 
@@ -37,15 +39,17 @@ export function ChatPanel() {
       <ChatHeader
         conversation={conversation}
         onBack={() => setMobilePane("list")}
-        onDetails={() => setDetailsOpen(true)}
+        onDetails={() => setDrawerMode("details")}
+        onLeave={() => setDrawerMode("leave")}
       />
       {/* Keyed remount per conversation resets scroll/arrival state. */}
       <ChatMessages key={conversation._id} conversation={conversation} />
 
-      {detailsOpen && conversation.type === "group" ? (
+      {drawerMode !== null && conversation.type === "group" ? (
         <GroupDetailsDrawer
           conversation={conversation}
-          onClose={() => setDetailsOpen(false)}
+          mode={drawerMode}
+          onClose={() => setDrawerMode(null)}
         />
       ) : null}
     </div>

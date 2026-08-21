@@ -21,6 +21,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { UserPicker } from "./UserPicker";
 import {
   useAddParticipants,
+  useLeaveGroup,
   usePromoteAdmin,
   useRemoveParticipant,
   useRenameGroup,
@@ -36,9 +37,12 @@ import type { GroupConversation, User } from "@/types/api";
  */
 export function GroupDetailsDrawer({
   conversation,
+  mode = "details",
   onClose,
 }: {
   conversation: GroupConversation;
+  /** `leave` raises the destructive confirmation immediately. */
+  mode?: "details" | "leave";
   onClose: () => void;
 }) {
   const meId = useAuthStore((s) => s.user?._id);
@@ -157,6 +161,22 @@ export function GroupDetailsDrawer({
       );
     } finally {
       setPromoteTarget(null);
+    }
+  }
+
+  /* ------------------------------- leave ------------------------------ */
+  const leaveGroup = useLeaveGroup();
+  const [leaveOpen, setLeaveOpen] = useState(mode === "leave");
+
+  async function handleLeave() {
+    try {
+      await leaveGroup.mutateAsync(conversation._id);
+      onClose(); // selection vanishes from cache → ChatPanel shows empty pane
+      toast.success("You left the group.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Couldn't leave the group.",
+      );
     }
   }
 
@@ -319,7 +339,7 @@ export function GroupDetailsDrawer({
             </div>
 
             {/* Actions */}
-            <div className="border-t border-line p-3">
+            <div className="flex flex-col gap-2 border-t border-line p-3">
               {isAdmin ? (
                 <Button
                   variant="secondary"
@@ -334,6 +354,15 @@ export function GroupDetailsDrawer({
                   Add members
                 </Button>
               ) : null}
+              <Button
+                variant="danger"
+                size="md"
+                className="w-full"
+                loading={leaveGroup.isPending}
+                onClick={() => setLeaveOpen(true)}
+              >
+                Leave group
+              </Button>
             </div>
           </motion.aside>
         </div>,
@@ -396,6 +425,21 @@ export function GroupDetailsDrawer({
         title="Promote to admin?"
         body={`${promoteTarget?.name ?? "This member"} will be able to rename the group, manage members, and promote others.`}
         confirmLabel="Promote"
+      />
+      {/* Leave confirmation */}
+      <ConfirmDialog
+        open={leaveOpen}
+        onClose={() => setLeaveOpen(false)}
+        onConfirm={() => void handleLeave()}
+        loading={leaveGroup.isPending}
+        danger
+        title="Leave this group?"
+        body={
+          isAdmin && conversation.admins.length === 1
+            ? "You're the only admin — adminship will transfer to another member automatically."
+            : "You'll lose access to this group's messages. You can only rejoin if an admin adds you back."
+        }
+        confirmLabel="Leave group"
       />
     </>
   );
