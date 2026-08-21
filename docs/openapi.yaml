@@ -1,0 +1,481 @@
+openapi: 3.0.3
+info:
+  title: NexaChat API (observed)
+  version: 1.0.0-observed
+  description: >
+    Reverse-engineered specification of the take-home chat API, documenting REAL observed
+    response bodies and status codes (the provided upstream spec intentionally omitted them).
+    All examples were captured live on 2026-08-21. See ISSUES.md for known server quirks.
+servers:
+  - url: https://frontend-task-chatapp.onrender.com/api
+    description: REST base
+  - url: https://frontend-task-chatapp.onrender.com
+    description: Host root (health check + Socket.io)
+tags:
+  - { name: Auth }
+  - { name: Users }
+  - { name: Conversations }
+  - { name: Groups }
+  - { name: Messages }
+  - { name: System }
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorEnvelope:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message: { type: string, example: "Validation failed" }
+            code:
+              type: string
+              enum: [VALIDATION_ERROR, NO_TOKEN, INVALID_TOKEN, UNKNOWN_USER, NOT_FOUND, FORBIDDEN, SERVER_ERROR]
+            details:
+              type: array
+              description: Present only for VALIDATION_ERROR
+              items:
+                type: object
+                properties:
+                  path: { type: string, example: "phone" }
+                  message: { type: string, example: "Required" }
+    User:
+      type: object
+      properties:
+        _id: { type: string, example: "6a882806e5d6aac97521e4b3" }
+        name: { type: string, example: "Ada Lovelace" }
+        phone: { type: string, example: "+15550000001" }
+        createdAt: { type: string, format: date-time }
+    SearchUser:
+      type: object
+      description: Search results omit createdAt
+      properties:
+        _id: { type: string }
+        name: { type: string }
+        phone: { type: string }
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        user: { $ref: '#/components/schemas/User' }
+    ParticipantRef:
+      type: object
+      description: Bare user id reference (direct conversations / lastMessage.sender)
+      properties:
+        userId: { type: string }
+    ConversationBase:
+      type: object
+      properties:
+        _id: { type: string }
+        type: { type: string, enum: [direct, group] }
+        updatedAt: { type: string, format: date-time }
+        lastMessage:
+          oneOf:
+            - type: object
+              nullable: false
+              properties:
+                text: { type: string }
+                sender: { type: string }
+                createdAt: { type: string, format: date-time }
+            - type: object
+              description: Empty object when a group has no messages yet
+              maxProperties: 0
+    GroupConversation:
+      allOf:
+        - $ref: '#/components/schemas/ConversationBase'
+        - type: object
+          properties:
+            type: { type: string, enum: [group] }
+            name: { type: string }
+            createdBy: { type: string }
+            admins: { type: array, items: { type: string } }
+            participants:
+              type: array
+              items: { $ref: '#/components/schemas/User' }
+    DirectConversation:
+      allOf:
+        - $ref: '#/components/schemas/ConversationBase'
+        - type: object
+          properties:
+            type: { type: string, enum: [direct] }
+            participant: { $ref: '#/components/schemas/User' }
+    ConversationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/GroupConversation'
+              - $ref: '#/components/schemas/DirectConversation'
+    LeanConversation:
+      type: object
+      description: Response of POST /conversations (DM create)
+      properties:
+        _id: { type: string }
+        participants: { type: array, items: { type: string } }
+        createdAt: { type: string, format: date-time }
+    Message:
+      type: object
+      properties:
+        _id: { type: string }
+        conversation: { type: string, description: Conversation id (field named "conversation", not "conversationId") }
+        sender: { type: string }
+        text: { type: string, description: May be empty/whitespace — server does not validate emptiness }
+        createdAt: { type: string, format: date-time }
+    MessagePage:
+      type: object
+      properties:
+        messages:
+          type: array
+          items: { $ref: '#/components/schemas/Message' }
+          description: Newest-first; default page size 20
+        hasMore: { type: boolean }
+    WsMessageEvent:
+      type: object
+      description: Socket.io message:new payload — note id (not _id) and epoch-millis createdAt
+      properties:
+        id: { type: string }
+        conversation: { type: string }
+        sender: { type: string }
+        text: { type: string }
+        createdAt: { type: integer, format: int64, description: Epoch milliseconds }
+
+  responses:
+    NoToken:
+      description: Missing Authorization header (note — HTTP 400, not 401)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          example: {"error": {"message": "No token provided", "code": "NO_TOKEN"}}
+    InvalidToken:
+      description: Bad/expired token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          example: {"error": {"message": "Invalid token", "code": "INVALID_TOKEN"}}
+    ValidationError:
+      description: Request body failed validation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          example: {"error": {"message": "Validation failed", "code": "VALIDATION_ERROR", "details": [{"path": "name", "message": "Required"}]}}
+    Forbidden:
+      description: Not a participant / not an admin
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          example: {"error": {"message": "Only admins can rename the group", "code": "FORBIDDEN"}}
+    ConversationNotFound:
+      description: Unknown conversation id
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          example: {"error": {"message": "Conversation not found", "code": "NOT_FOUND"}}
+    UnknownUser:
+      description: Referenced user doesn't exist (also returned for self-DM attempts)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          example: {"error": {"message": "One or more users do not exist", "code": "UNKNOWN_USER"}}
+
+paths:
+  /health:
+    get:
+      tags: [System]
+      summary: Health check (host root, not under /api)
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: {"status": "ok"}
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in or register (upsert by phone)
+      description: New phone registers; existing phone logs in AND renames the account.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, name]
+              properties:
+                phone: { type: string, example: "+15550000001" }
+                name: { type: string, example: "Ada Lovelace" }
+      responses:
+        '200':
+          description: Token + user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Current user (session restore)
+      responses:
+        '200':
+          description: User object
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '400': { $ref: '#/components/responses/NoToken' }
+        '401': { $ref: '#/components/responses/InvalidToken' }
+
+  /users/search:
+    get:
+      tags: [Users]
+      summary: Search users (case-sensitive name-prefix only; see quirks)
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string }
+          description: >
+            Prefix of a user's name (exact case). Regex metacharacters cause HTTP 500.
+            Empty q returns the entire directory.
+      responses:
+        '200':
+          description: Matching users (may include self)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SearchUser' }
+        '400': { $ref: '#/components/responses/NoToken' }
+        '500':
+          description: Server regex crash on metacharacters
+          content:
+            application/json:
+              example: {"error": {"message": "Regular expression is invalid: quantifier does not follow a repeatable item", "code": 51091}}
+
+  /conversations:
+    get:
+      tags: [Conversations]
+      summary: List my conversations (updatedAt desc)
+      responses:
+        '200':
+          description: Enriched conversation list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationListResponse' }
+        '400': { $ref: '#/components/responses/NoToken' }
+    post:
+      tags: [Conversations]
+      summary: Start or reopen a direct conversation (server dedupes by pair)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId: { type: string }
+      responses:
+        '200':
+          description: Lean conversation entity (same _id on repeat calls)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeanConversation' }
+        '400':
+          description: UNKNOWN_USER (bogus id or self)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  /conversations/{id}/messages:
+    get:
+      tags: [Conversations]
+      summary: Paginated history (newest-first, inclusive before-cursor)
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+          description: 0 falls back to default
+        - in: query
+          name: before
+          schema: { type: string }
+          description: Message _id cursor; INCLUSIVE — boundary message reappears on next page; unknown ids are silently ignored
+      responses:
+        '200':
+          description: Message page
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessagePage' }
+        '400': { $ref: '#/components/responses/NoToken' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/ConversationNotFound' }
+
+  /messages:
+    post:
+      tags: [Messages]
+      summary: Send a message (also broadcast via message:new to others)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [conversationId, text]
+              properties:
+                conversationId: { type: string }
+                text: { type: string, description: Server accepts empty/whitespace — clients must validate }
+      responses:
+        '200':
+          description: >
+            Created message entity. NOTE — nonexistent conversations return 200 with body null
+            (silent failure); empty/whitespace text is stored as-is.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: '#/components/schemas/Message' }
+                  - { type: 'null', description: Silent failure for unknown conversationId }
+        '400':
+          description: Validation error or NO_TOKEN
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  /conversations/group:
+    post:
+      tags: [Groups]
+      summary: Create group (creator becomes admin; >=3 total members enforced)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, participantIds]
+              properties:
+                name: { type: string }
+                participantIds:
+                  type: array
+                  minItems: 2
+                  items: { type: string }
+      responses:
+        '201':
+          description: Full enriched group entity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupConversation' }
+        '400':
+          description: Validation error (incl. "a group needs at least 3 members")
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  /conversations/{id}:
+    patch:
+      tags: [Groups]
+      summary: Rename group (admins only)
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+      responses:
+        '200':
+          description: Refreshed entity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupConversation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /conversations/{id}/participants:
+    post:
+      tags: [Groups]
+      summary: Add members (admins only; unknown ids currently 500)
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userIds]
+              properties:
+                userIds: { type: array, items: { type: string } }
+      responses:
+        '200':
+          description: Refreshed entity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupConversation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500':
+          description: Unknown userId crashes server
+          content:
+            application/json:
+              example: {"error": {"message": "Cast to ObjectId failed…", "code": "SERVER_ERROR"}}
+
+  /conversations/{id}/participants/{userId}:
+    delete:
+      tags: [Groups]
+      summary: Remove member (admins only) — own id leaves the group (sole-admin auto-transfers adminship)
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: path, name: userId, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Refreshed entity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupConversation' }
+
+  /conversations/{id}/admins:
+    post:
+      tags: [Groups]
+      summary: Promote member to admin (admins only)
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId: { type: string }
+      responses:
+        '200':
+          description: Refreshed entity with expanded admins[]
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupConversation' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+externalDocs:
+  description: WebSocket events & full quirk log
+  url: ./API.md
