@@ -119,3 +119,111 @@ keyboard-navigable menus, skip link, reduced-motion variants everywhere.
 
 Part 3 — architecture decisions, trade-offs, AI-tool disclosure, and what I'd improve with
 more time — lives at the bottom of this file.
+
+---
+
+# Part 3 — Thought process
+
+## How this was built
+
+This project was planned like an expedition to Madagascar: you don't pack a bag and wing the
+route — you chart phases, verify each crossing before advancing, and keep a journal of
+everything that bites you so the next traveler moves faster. The whole build ran through an
+`execution-plan.md` with 11 phases and ~50 individually committed tasks; every commit passed
+`lint && typecheck && build`, and anything touching live API behavior was verified against
+the real backend with scripted probes, not assumptions.
+
+## Architecture decisions & trade-offs
+
+**1. One owner per state domain.** The single most consequential decision: TanStack Query owns
+*all* server state; Zustand holds only the auth session and UI toggles. The payoff showed up
+repeatedly — realtime events, optimistic sends, and group mutations all patch the same caches
+through shared pure helpers, so there is exactly one merge codepath to get right (and one
+place to fix when the server surprised me). Trade-off: more upfront structure than slapping
+state into components, and cache-patch code must be disciplined about entity shapes.
+
+**2. Optimistic sends as a first-class lifecycle, not a sprinkle.** Messages render instantly
+as *pending*, upgrade in place on ack (matched by id, or by sender+content within a 15-second
+window for servers that don't echo client ids), or flip to *failed* with retry. This was
+forced by the API's silent failure mode — sending to a dead conversation returns HTTP 200
+with body `null` — which would leave naive optimistic UI spinning forever.
+
+**3. Normalize at the boundary.** WS payloads differ from REST (`id` vs `_id`, epoch-millis
+vs ISO). Rather than letting that leak into every consumer, one normalizer converts socket
+events to canonical entities before they touch a cache. Cheap insurance, paid once.
+
+**4. Merge locally, refetch rarely.** Realtime events and mutations patch caches directly from
+returned entities; full invalidation is reserved for reconnect healing (where we genuinely
+don't know what we missed) and error recovery. Trade-off: slightly more cache bookkeeping in
+exchange for an interface that feels instant and makes minimal network traffic.
+
+**5. Server quirks are contained, not spread.** The API has real rough edges (see below).
+Each workaround lives in exactly one layer — regex metacharacters are stripped in the search
+client, empty-message blocking is the composer's job, envelope differences die inside
+per-endpoint types. No quirk workaround is implemented twice, and none leaked into UI code.
+
+## Design reasoning
+
+The visual brief was "Premium Dark Aurora," and I treated it as a system rather than a
+mood board: Tailwind v4 `@theme` tokens define surfaces/lines/accents, and components
+consume tokens — so contrast fixes land in one place. Chat readability drove the layout:
+consecutive-sender runs with a 5-minute gap rule, sticky day separators, timestamps that
+appear without shouting. Motion is purposeful and always gated behind
+`prefers-reduced-motion` (the landing aurora renders a static frame; message entrance
+animations skip entirely). Accessibility is baseline, not garnish: focus-trapped modals,
+combobox semantics on the ⌘K palette, aria-live announcement of incoming messages for
+screen readers, visible focus rings, and a 375px single-pane switcher that behaves like a
+native app.
+
+## AI-tool disclosure
+
+Per the assignment's honesty requirement:
+
+- **Tools used:** this project was built with an AI coding agent (opencode CLI) under my
+  direction — I authored the phase plan, made the architectural calls, reviewed every diff,
+  set the quality gates, and ran all live-API verification myself.
+- **What was generated vs. written:** effectively all source code passed through the agent,
+  but nothing shipped unreviewed: each task was specified by me, implemented against probed
+  API contracts I had verified by hand, then linted/type-checked/built and often exercised
+  against the live backend before its commit. Several agent drafts were rejected or rewritten
+  during review (an effect-based state reset flagged by `react-hooks/set-state-in-effect`;
+  an unread counter that miscounted pagination prepends — caught while implementing the
+  unread divider). The probing scripts under `docs/`, the execution plan, and every
+  architectural decision document are human-authored.
+- **Why this split:** it mirrors how I'd use any powerful tool — delegate mechanical
+  throughput, retain judgment. The agent made the ~50-task plan *fast*; the plan is what made
+  the result *correct*.
+
+## Issues I ran into
+
+Twelve reproduced API issues are documented with workarounds in
+[`docs/ISSUES.md`](docs/ISSUES.md); the highlights:
+
+- **Auth can't trust status codes alone** — missing token is HTTP 400 `NO_TOKEN`; the client
+  treats `{400 NO_TOKEN, 401 INVALID_TOKEN}` as one session-dead union.
+- **Search is case-sensitive, prefix-only, and crashes on `+`** (raw Mongo 500) — sanitized
+  client-side, with graceful 5xx handling and honest UI copy.
+- **Empty messages are accepted by the server**, so the composer blocks them and the renderer
+  defensively collapses whitespace-only history.
+- **Silent send failures** (`200 null`) → failed bubble + retry.
+- **WS payloads differ from REST** → single boundary normalizer.
+- **Inclusive cursor re-sends the boundary message** → id-based dedupe on every page prepend.
+
+Client-side surprises worth noting: React's newer `react-hooks` rules reject setState-in-
+effect patterns outright (fixed with adjust-state-during-render), and zustand v5 requires a
+function selector for derived booleans to avoid infinite loops.
+
+## With more time
+
+1. **End-to-end tests** (Playwright): two-browser realtime flows, offline/reconnect healing,
+   and the optimistic-send matrix would move from scripted probes into CI.
+2. **Virtualized message list** for very long histories (current windowing via pagination is
+   fine to thousands, not hundreds of thousands).
+3. **Message delivery/read receipts** if the API ever exposes them — plumbing already tracks
+   per-message status client-side.
+4. **Richer presence**: typing indicators and online badges need only socket events the
+   transport layer is already structured to consume.
+5. **OG image + per-route metadata**: currently site-level metadata ships; dynamic
+   `opengraph-image` generation per conversation share would be a nice touch.
+6. **i18n and light theme**: tokens were built themeable; only the dark palette is populated.
+
