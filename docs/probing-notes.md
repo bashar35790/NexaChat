@@ -143,3 +143,26 @@ Group takeaways: every mutation returns the full refreshed entity → use it to 
 directly without refetching. Permission errors are uniform `403 FORBIDDEN` with human messages.
 Client wizard must enforce ≥2 selected others (server message verbatim available for inline errors).
 
+## WebSocket (Socket.io at host root)
+
+| Case | Observed |
+|---|---|
+| Handshake w/ valid JWT | Connected (websocket transport) |
+| Handshake w/ garbage token | `connect_error: "Invalid token"` |
+| REST send by Ada | **Only other participant (Bob) receives `message:new` — NO self-echo for the sender** |
+| Socket `message:send` w/ ack by Bob | Ada received `message:new`; Bob got ack `{"ok":true}`; **no self-echo either** |
+| `message:send` without ack callback | Delivers normally |
+| Empty text via socket | **Accepted** (`{"ok":true}`, broadcast with `text:""`) — mirrors REST gap |
+| Send to nonexistent conversation via socket | Ack `{"ok":false,"error":"Conversation not found"}` — clean error (unlike REST null-200) |
+| Group rename while connected | Both members received `conversation:updated` with the **full enriched conversation entity** |
+
+**WS payload shape differs from REST:** `{"id", "conversation", "sender", "text", "createdAt"}`
+where the key is `id` (**not** `_id`) and `createdAt` is **epoch milliseconds (number)** rather than an
+ISO string. A client-side normalizer must unify these before entering the query cache.
+
+Realtime design conclusions:
+- Optimistic temp messages reconcile by swapping in the REST response entity's `_id`; since the server
+  never echoes own messages back, there is no optimistic/echo race to guard.
+- Incoming `message:new` can be appended directly (still sort-guarded); `conversation:updated`
+  patches/replaces the conversation list item wholesale.
+
