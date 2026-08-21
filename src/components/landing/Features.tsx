@@ -39,10 +39,10 @@ export function Features() {
           <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent ring-1 ring-primary/20">
             Crafted for speed & clarity
           </p>
-          <h2 className="mt-4 font-display font-bold tracking-tight text-white [font-size:clamp(2rem,3vw+1rem,3.25rem)] [text-wrap:balance]">
+          <h2 className="mt-4 font-display font-bold tracking-tight text-white text-[clamp(2rem,3vw+1rem,3.25rem)] text-wrap-balance">
             Everything a conversation needs.
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-muted [text-wrap:pretty]">
+          <p className="mt-4 text-lg leading-relaxed text-muted text-wrap-pretty">
             No setup ceremonies, no lost threads — just the mechanics of great
             messaging, done properly with luxury engineering.
           </p>
@@ -54,13 +54,13 @@ export function Features() {
               <article className="group relative flex h-full flex-col overflow-hidden rounded-panel border border-line bg-surface/60 p-1 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_16px_40px_rgba(99,102,241,0.18)]">
                 <div
                   aria-hidden="true"
-                  className="flex h-44 items-center justify-center rounded-t-[1.1rem] border-b border-line bg-gradient-to-br from-primary/15 via-violet/5 to-transparent"
+                  className="flex h-44 items-center justify-center rounded-t-[1.1rem] border-b border-line bg-linear-to-br from-primary/15 via-violet/5 to-transparent"
                 >
                   {feature.vignette}
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-6">
                   <h3 className="flex items-center gap-3 font-display text-lg font-bold tracking-tight text-white">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/25 to-violet/25 text-white ring-1 ring-primary/40 shadow-glow">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary/25 to-violet/25 text-white ring-1 ring-primary/40 shadow-glow">
                       {feature.icon}
                     </span>
                     <span className="text-white font-display text-lg font-bold">{feature.title}</span>
@@ -98,7 +98,7 @@ function RealtimeVignette() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.35, ease: "easeOut", delay: 0.45 }}
-        className="self-end rounded-xl rounded-br-sm bg-gradient-to-br from-primary to-violet px-3 py-1.5 text-xs text-white shadow-glow"
+        className="self-end rounded-xl rounded-br-sm bg-linear-to-br from-primary to-violet px-3 py-1.5 text-xs text-white shadow-glow"
       >
         already here
       </motion.span>
@@ -133,7 +133,7 @@ function GroupsVignette() {
               ease: "easeOut",
               delay: 0.15 + index * 0.12,
             }}
-            className={`flex items-center justify-center rounded-full bg-gradient-to-br text-xs font-semibold text-white ring-2 ring-surface ${
+            className={`flex items-center justify-center rounded-full bg-linear-to-br text-xs font-semibold text-white ring-2 ring-surface ${
               index % 2 === 0
                 ? "from-primary to-violet"
                 : "from-violet to-accent"
@@ -181,7 +181,7 @@ function SearchVignette() {
           transition={{ duration: 0.28, ease: "easeOut", delay: 0.5 + index * 0.25 }}
           className="flex h-8 items-center gap-2 rounded-lg bg-raised px-3 ring-1 ring-line"
         >
-          <span className="flex size-4 items-center justify-center rounded-full bg-gradient-to-br from-primary to-violet text-[8px] font-semibold text-white">
+          <span className="flex size-4 items-center justify-center rounded-full bg-linear-to-br from-primary to-violet text-[8px] font-semibold text-white">
             {name.slice(0, 1)}
           </span>
           <span className="truncate text-[11px]">{name}</span>
