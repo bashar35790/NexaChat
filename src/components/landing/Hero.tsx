@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { AuroraCanvas } from "./AuroraCanvas";
+import { ChatReplay } from "./ChatReplay";
 
 const PRIMARY_CTA =
   "inline-flex h-12 select-none items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-violet px-6 text-base font-medium text-white shadow-glow transition-[filter] duration-150 hover:brightness-110 active:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
@@ -83,50 +84,11 @@ export function Hero() {
                 <span className="relative inline-flex size-2 rounded-full bg-success" />
               </span>
             </div>
-            {/* mockup body — replaced by live replay in T9.2 */}
-            <div id="hero-replay-body" className="flex min-h-72 flex-col gap-2.5 p-4">
-              <HeroStaticBubble text="Welcome to NexaChat." time="09:41" />
-              <HeroStaticBubble
-                mine
-                text="Messages arrive the instant they're sent."
-                time="09:41"
-              />
-              <HeroStaticBubble text="Pull up a chair." time="09:42" />
-            </div>
+            {/* mockup body — live scripted replay (loops; static under reduced motion) */}
+            <ChatReplay />
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function HeroStaticBubble({
-  mine,
-  text,
-  time,
-}: {
-  mine?: boolean;
-  text: string;
-  time: string;
-}) {
-  return (
-    <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
-          mine
-            ? "rounded-br-md bg-gradient-to-br from-primary to-violet text-white shadow-glow"
-            : "rounded-bl-md bg-raised text-fg ring-1 ring-line"
-        }`}
-      >
-        {text}
-        <span
-          className={`ml-2 align-baseline text-[10px] ${
-            mine ? "text-white/70" : "text-faint"
-          }`}
-        >
-          {time}
-        </span>
-      </div>
-    </div>
   );
 }
