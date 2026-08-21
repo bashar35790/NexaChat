@@ -1,13 +1,12 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { useLogin } from "@/hooks/useLogin";
 import { LoginForm } from "./LoginForm";
 
-/**
- * Glass form panel. The real authenticate flow (API → store → redirect)
- * lands in the next commit; the no-op keeps the UI shippable until then.
- */
 export function LoginCard() {
+  const login = useLogin();
+
   return (
     <div className="relative z-10 w-full max-w-md rounded-panel border border-line bg-surface/60 p-7 shadow-panel backdrop-blur-xl sm:p-9">
       <div className="mb-8 flex items-center gap-2.5 lg:hidden">
@@ -26,7 +25,7 @@ export function LoginCard() {
         Your phone number is all it takes.
       </p>
 
-      <LoginForm onAuthenticate={async () => {}} />
+      <LoginForm onAuthenticate={(values) => login.mutateAsync(values)} />
     </div>
   );
 }

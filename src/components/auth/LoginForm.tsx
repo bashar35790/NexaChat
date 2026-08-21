@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ApiError } from "@/lib/api/client";
 import { normalizePhone } from "@/lib/utils/phone";
 
 export interface LoginValues {
@@ -12,7 +13,7 @@ export interface LoginValues {
 
 export interface LoginFormProps {
   /** Full auth flow (API call → store → redirect). Owned by the page. */
-  onAuthenticate: (values: LoginValues) => Promise<void>;
+  onAuthenticate: (values: LoginValues) => Promise<unknown>;
 }
 
 interface FieldErrors {
@@ -64,6 +65,24 @@ export function LoginForm({ onAuthenticate }: LoginFormProps) {
         phone: normalizePhone(values.phone).value,
       });
     } catch (error) {
+      // Server VALIDATION_ERROR carries details[{path,message}] — route those
+      // to their fields instead of the generic banner.
+      if (
+        error instanceof ApiError &&
+        error.code === "VALIDATION_ERROR" &&
+        error.details?.length
+      ) {
+        const mapped: FieldErrors = {};
+        for (const detail of error.details) {
+          if (detail.path === "name" || detail.path === "phone") {
+            mapped[detail.path] ??= detail.message;
+          }
+        }
+        if (mapped.name || mapped.phone) {
+          setFieldErrors((prev) => ({ ...prev, ...mapped }));
+          return;
+        }
+      }
       setFormError(
         error instanceof Error
           ? error.message
